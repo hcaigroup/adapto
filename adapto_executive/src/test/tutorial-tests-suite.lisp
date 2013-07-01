@@ -175,15 +175,15 @@
 
 ;; Tests if Initialization of hhmm from stpr-library works correctly
 (deftest test-stpr-hmm-init
-    (let ( (stpr-library (ad-exe:generate-stpr-library))
+    (let ( (stpr-library (generate-stpr-library))
            (loc-str-table NIL)
            (hmm (make-instance 'hmm)))
-      (setf loc-str-table (ad-exe:generate-location-string-table stpr-library))
+      (setf loc-str-table (generate-location-string-table stpr-library))
       NIL
-      (set-belief hmm (ad-exe:create-uniform-state-probabilities-from-stpr-library stpr-library))
-      (set-start-belief hmm (ad-exe:create-uniform-state-probabilities-from-stpr-library stpr-library))
-      (set-state-transitions hmm (ad-exe:create-state-transition-probabilities))
-      (set-observation-probabilities hmm (ad-exe:create-state-observation-probabilities) )
+      (set-belief hmm (create-uniform-state-probabilities-from-stpr-library stpr-library))
+      (set-start-belief hmm (create-uniform-state-probabilities-from-stpr-library stpr-library))
+      (set-state-transitions hmm (create-state-transition-probabilities))
+      (set-observation-probabilities hmm (create-state-observation-probabilities) )
       (hash-table-size (get-belief hmm)))
     16)
 
@@ -196,7 +196,7 @@
       (set-state-transitions hmm (create-umbrella-state-transition-probabilities))
       (set-observation-probabilities hmm (create-umbrella-state-observation-probabilities) )
       (set-observations hmm '(umbrella umbrella noumbrella umbrella umbrella))
-      (ad-exe:forward-backward hmm)
+      (forward-backward hmm)
       (eq 0.8673389 (gethash  (string 'DW-RAIN) (get-belief hmm))))
   T)
 
@@ -209,6 +209,6 @@
       (set-state-transitions hmm (create-umbrella-state-transition-probabilities))
       (set-observation-probabilities hmm (create-umbrella-state-observation-probabilities) )
       (set-observations hmm '(umbrella umbrella noumbrella umbrella umbrella))
-      (equal (ad-exe:viterbi hmm)
+      (equal (viterbi hmm)
           '("DW-RAIN" "DW-RAIN" "DW-SUN" "DW-RAIN" "DW-RAIN")))
   T)
