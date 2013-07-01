@@ -1,0 +1,1 @@
+../bbarchitecture/bbarchitecture.asd

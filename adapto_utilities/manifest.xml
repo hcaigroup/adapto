@@ -1,0 +1,15 @@
+<package>
+  <description brief="adapto_utilities">
+
+     adapto_utilities
+
+  </description>
+  <author>Michael Karg</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/adapto_utilities</url>
+  <depend package="cram_utilities"/>
+
+</package>
+
+
