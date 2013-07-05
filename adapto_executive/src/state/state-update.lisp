@@ -82,8 +82,8 @@
 (let ( (topics `(("/pr2/Pose_sensor" "nav_msgs/Odometry" store-position-data)
                  ("/Human/Pose" "nav_msgs/Odometry" store-human-position-data)
                  ;; ("/pr2/CameraMain" "std_msgs/String" store-object-data)
-                 ("/objects_relative_to_map" "std_msgs/String" store-object-data)
-                 ;; ("/b21/object_tracker" "std_msgs/String" store-object-data)
+                 ;; ("/objects_relative_to_map" "std_msgs/String" store-object-data)
+                 ("/james/semantic_camera" "std_msgs/String" store-object-data)
                  ))
        (subscribers '()) )
   (defun start-statevar-update ()
@@ -95,8 +95,7 @@
   (defun stop-statevar-update ()
     (when subscribers
       (roslisp:unsubscribe (pop subscribers))
-      (stop-statevar-update)))
-)
+      (stop-statevar-update))))
 
 ;(setf (gethash 'start-adapto-statevar-update cram-roslisp-common::*ros-init-functions*)
 ;      #'start-statevar-update)
