@@ -108,10 +108,10 @@
            (setf plan-probs (calculate-plan-probabilities (belief hmm)))
            (unless (eq plan-probs NIL) (visualize-plan-probs plan-probs))
            (unless (eq plan-probs NIL)
-             (write-plan-probs-to-csv plan-probs "/home/kargm/Desktop/plan-probs.csv"))
+             (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv"))
            (unless (eq merged-belief NIL)
              (write-loc-probs-to-csv
-              merged-belief "/home/kargm/Desktop/loc-probs.csv")))
+              merged-belief "~/Desktop/loc-probs.csv")))
         
         ;; Check if human has moved every movement-time seconds
         (when (> deltaT (human-movement-time params))
@@ -169,7 +169,7 @@
                                 ;; (setf merged-plan-probs (weight-beliefs plan-probs plan-object-hits))
 
                                 (visualize-plan-probs plan-probs)
-                                (write-plan-probs-to-csv plan-probs "/home/kargm/Desktop/plan-probs.csv")
+                                (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv")
                                 ;; (write-loc-probs-to-csv
                                 ;;  (normalize-belief (forward-step-belief hmm)) "/home/kargm/Desktop/loc-probs.csv")
 
@@ -209,7 +209,7 @@
                                                               last-motion-data
                                                               loc-str-table
                                                               plan-library))
-                                (write-good-plan-obs-to-csv good-plan-observations "/home/kargm/Desktop/good-plan-obs.csv")
+                                (write-good-plan-obs-to-csv good-plan-observations "~/Desktop/good-plan-obs.csv")
                                 (setf monitoring-belief
                                       (predict-locations
                                        good-plan-observations
@@ -232,12 +232,12 @@
 
                                 (unless (eq merged-belief NIL)
                                   (write-loc-probs-to-csv
-                                   merged-belief "/home/kargm/Desktop/loc-probs.csv"))
+                                   merged-belief "~/Desktop/loc-probs.csv"))
                                 (setf merged-belief
                                       (normalize-belief
                                        (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
                                 (write-loc-probs-to-csv
-                                 merged-belief "/home/kargm/Desktop/loc-probs.csv")
+                                 merged-belief "~/Desktop/loc-probs.csv")
                                 ;; (setf merged-belief (normalize-belief (merge-beliefs
                                 ;;                                        monitoring-belief
                                 ;;                                        (normalize-belief (forward-step-belief hmm)))))

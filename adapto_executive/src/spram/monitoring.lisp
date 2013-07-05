@@ -137,7 +137,7 @@
              plan-probabilities)
     
     ;; Keep track if plan has been finished according to visited locations
-    (with-open-file (file "/home/kargm/Desktop/monitoring.csv"
+    (with-open-file (file "~/Desktop/monitoring.csv"
                             :direction :output
                             :if-exists :append
                             :if-does-not-exist :create)
