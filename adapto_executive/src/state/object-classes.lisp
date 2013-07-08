@@ -12,12 +12,17 @@
 ;; Checks if object has moved since last detection. Returns T or NIL
 ;; NOTE: distance value for simulation should be lower (0.005?)
 (defmethod has-moved (thing)
+  "Return T if object has moved since last detection"
   (let ((has-moved-p
         (unless (null (last-detection thing))
-          (> (cl-transforms:v-dist (cl-transforms:origin [(pose thing)]) (cl-transforms:origin (last-detection thing)))
-             0.1 ))
-          ))
-    ;; (format t "--- has_moved: distance ~s~%" (cl-transforms:v-dist (cl-transforms:origin [(pose thing)]) (cl-transforms:origin (last-detection thing))))
+          (> (cl-transforms:v-dist
+              (cl-transforms:origin [(pose thing)])
+              (cl-transforms:origin (last-detection thing)))
+             0.1 ))))
+    (format t "--- has_moved: distance ~s~%"
+            (cl-transforms:v-dist
+             (cl-transforms:origin [(pose thing)])
+             (cl-transforms:origin (last-detection thing))))
     has-moved-p))
 
 ;; agents
@@ -42,7 +47,7 @@
 
 (defclass cuboard (furniture cuboid)
   ( (doors :initform () :initarg :doors :accessor doors)
-    (door-joints :initform () :initarg :door-joints :accessor door-joints) ))
+    (door-joints :initform () :initarg :door-joints :accessor door-joints)))
 
 (defclass chair (furniture chair-form) ())
 
@@ -64,4 +69,4 @@
 (defclass plate (tableware cylinder) ())
 
 (defclass cup (tableware cylinder)
-  ( (handle-position :initform :handle-position :accessor handle-position) ))
+  ( (handle-position :initform :handle-position :accessor handle-position)))

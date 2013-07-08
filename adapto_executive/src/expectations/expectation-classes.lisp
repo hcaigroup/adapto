@@ -28,27 +28,29 @@
 
 (defgeneric validate-expectation (x))
 
-(defmethod validate-expectation (x) (error "[expectation-classes.lisp] - No validation-function defined for this type"))
+(defmethod validate-expectation (x)
+  (error "[expectation-classes.lisp] - No validation-function defined for this type"))
 
-;; For the moment return 1 if pose is inside area, 0 if not
 (defmethod validate-expectation ((exp position-expectation))
+  "Returns 1 if POSE of POSITION-EXPECTATION is inside AREA, else returns 0"
   (if (inside-area (area exp) (pose exp))
     1
     0))
 
-;; Return 0 if object that is not flexible has moved, otherwise return 1  
 (defmethod validate-expectation ((exp object-expectation))
-   (cond
+  "Returns 0 if a non-flexible object has moved, 1 otherwise"
+  (cond
      ((and (has-moved (object exp)) (not (flexible exp)))
        (format t "An object moved unexpectedly...~%")
        0)
      (t 1)))
 
 (defmethod validate-expectation ((exp navigation-action-expectation))
+  "Non-generic function to check if navigation action is finished in expected time using fixed
+   value for average robot speed."
   (let ((time-since-start (- (roslisp:ros-time) (start-time exp))))
     ;; (format t "Navigation-action should take ~s seconds for path of length ~s ~%" (duration exp) (path-length exp))
     ;; (format t "Navigation-action in progress since ~s seconds~%" time-since-start)
-    ;; If navigation takes longer than expexted
     (cond
       ;; As long as action within the expected time, return 1
       ((> (- (duration exp) time-since-start) 0) 1)
