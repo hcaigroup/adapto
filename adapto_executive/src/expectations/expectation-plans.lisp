@@ -78,7 +78,7 @@
         (cram-process-modules:pm-execute :navigation loc3-desig))
       (start-expectation-validation))))
 
-;; Navigate to 3 points and monitor time of navigation-action
+;; Navigate to 3 points in apartment and monitor time of navigation-action
 (def-top-level-plan apartment-task()
   (start-statevar-update)
   (create-global-structure :expectations)
@@ -95,31 +95,12 @@
                       ,(tf:make-pose-stamped "/map" 0.0 
                                              (tf:make-3d-vector 0.0824 -4.234 0.0) 
                                              (tf:euler->quaternion :az 0.121))))))
-
        ( loc3-desig 
-         (location `((pose 
-                      ,(tf:make-pose-stamped "/map" 0.0 
-                                             (tf:make-3d-vector 1.2119 -2.837 0.0) 
-                                             (tf:euler->quaternion :az 1.441))))))
-       ( loc4-desig 
-         (location `((pose 
-                      ,(tf:make-pose-stamped "/map" 0.0 
-                                             (tf:make-3d-vector 2.3016 -2.376 0.0) 
-                                             (tf:euler->quaternion :az 0.353))))))
-
-       ( loc5-desig 
          (location `((pose 
                       ,(tf:make-pose-stamped "/map" 0.0 
                                              (tf:make-3d-vector 4.207 -0.277 0.0) 
                                              (tf:euler->quaternion :az 1.874))))))
-
-       ( loc6-desig 
-         (location `((pose 
-                      ,(tf:make-pose-stamped "/map" 0.0 
-                                             (tf:make-3d-vector 2.512 -2.259 0.0) 
-                                             (tf:euler->quaternion :az 3.104))))))
-
-       ( loc7-desig 
+       ( loc4-desig 
          (location `((pose 
                       ,(tf:make-pose-stamped "/map" 0.0 
                                              (tf:make-3d-vector -5.117 -2.259 0.0) 
@@ -133,13 +114,7 @@
         (sleep 2)
         (cram-process-modules:pm-execute :navigation loc2-desig)
         (sleep 2)
-        (cram-process-modules:pm-execute :navigation loc3-desig)
-        (sleep 2)
-        (cram-process-modules:pm-execute :navigation loc4-desig)
-        (sleep 2)
         (cram-process-modules:pm-execute :navigation loc5-desig)
-        (sleep 2)
-        (cram-process-modules:pm-execute :navigation loc6-desig)
         (sleep 2)
         (cram-process-modules:pm-execute :navigation loc7-desig))
       
