@@ -10,6 +10,11 @@
   ((area :initarg :area :accessor area)
    (pose :initarg :pose :accessor pose)))
 
+(defclass next-location-expectation (expectation)
+  ((current-location :initarg :current-location :accessor current-location)
+  (next-location :initarg :next-location :accessor next-location)
+  (weight :initarg :weight :accessor weight)))
+
 (defclass object-expectation (expectation)
   ((object :initarg :object :accessor object)
    (flexible :initarg :flexible :accessor flexible)))
