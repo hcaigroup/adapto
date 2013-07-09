@@ -11,9 +11,9 @@
    (pose :initarg :pose :accessor pose)))
 
 (defclass next-location-expectation (expectation)
-  ((current-location :initarg :current-location :accessor current-location)
-  (next-location :initarg :next-location :accessor next-location)
-  (weight :initarg :weight :accessor weight)))
+  ((next-location-guess :initarg :next-location-guess :accessor next-location-guess)
+   (next-location :initarg :next-location :accessor next-location)
+   (weight :initarg :weight :accessor weight)))
 
 (defclass object-expectation (expectation)
   ((object :initarg :object :accessor object)
@@ -41,6 +41,12 @@
   (if (inside-area (area exp) (pose exp))
     1
     0))
+
+(defmethod validate-expectation ((exp next-location-expectation))
+  "Returns weight of EXP if locations match, 0 otherwise"
+  (if (string= (next-location-guess exp) (next-location exp))
+      (weight exp)
+      0))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
