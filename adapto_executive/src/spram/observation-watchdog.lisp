@@ -33,7 +33,8 @@
     (format t "~%~% --------------------------- HMM INIT DONE --------------------------------~%")
 
     (setf good-plan-observations (init-plan-good-observations-table plan-library))
-    (let ((params (get-real-params)))
+    (let (;; (params (get-real-params))
+          (params (get-morse-params)))
       
       (format t "~%~% --------------------------- OBSERVATION PARAMS: --------------------------~%")
       (format t "| movent distance: ~15s                                          |~%" (movement-distance params))

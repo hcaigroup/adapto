@@ -8,7 +8,7 @@
 
 (defun get-morse-params ()
   (let ((params (make-instance 'parameters
-                  :objects-ros-topic "/b21/object_tracker"
+                  :objects-ros-topic "/james/semantic_camera"
                   :movement-distance 0.01
                   :turning-angle 1.06
                   :human-movement-time 0.5)))
