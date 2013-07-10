@@ -119,3 +119,25 @@
         (cram-process-modules:pm-execute :navigation loc7-desig))
       
       (start-expectation-validation))))
+
+;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
+;; probabilities about human task execution and use those to generate expectations
+(def-top-level-plan garching-task()
+  ;; (start-statevar-update)
+  (startup-ros)
+  (create-global-structure :expectations)
+  ;; (generate-location-expectations)
+  
+  (with-designators 
+      (( loc1-desig 
+         (location `((pose 
+                      ,(tf:make-pose-stamped "/map" 0.0 
+                                             (tf:make-3d-vector 3 3 0.0) 
+                                             (tf:euler->quaternion :az -1.565)))))))
+    (par
+      (start-observation-watchdog)      
+      (maybe-run-process-modules)
+      (seq 
+        (cram-process-modules:pm-execute :navigation loc1-desig))
+      ;; (start-expectation-validation)
+      )))
