@@ -42,20 +42,21 @@
       (format t "| human-movement-time: ~15s~%" (human-movement-time params))
       (format t "--------------------------------------------------------------------------~%")
       
-      (roslisp:with-ros-node ("observation-watchdog" :spin t)
-      (setf sub1
-            (roslisp:subscribe "/Human/Pose"
-                               "nav_msgs/Odometry"
-                               #'observe-human-motion
-                               :max-queue-length 1))
-      (setf sub2
-            (roslisp:subscribe (objects-ros-topic params)
-                               "std_msgs/String"
-                               #'update-object-detections
-                               :max-queue-length 1))
-      (setf walking-dir-publisher
-            (roslisp:advertise "walking_dir" "nav_msgs/Odometry"))
-      (start-statevar-update))))
+      ;;(roslisp:with-ros-node ("observation-watchdog" :spin t)
+        (setf sub1
+              (roslisp:subscribe "/Human/Pose"
+                                 "nav_msgs/Odometry"
+                                 #'observe-human-motion
+                                 :max-queue-length 1))
+        (setf sub2
+              (roslisp:subscribe (objects-ros-topic params)
+                                 "std_msgs/String"
+                                 #'update-object-detections
+                                 :max-queue-length 1))
+        (setf walking-dir-publisher
+              (roslisp:advertise "walking_dir" "nav_msgs/Odometry"))
+        (start-statevar-update)))
+  ;;)
 
   (defun stop-observation-watchdog ()
     "Unsubscribe from ROS topics and terminate connection to ROS."
