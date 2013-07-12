@@ -377,6 +377,21 @@ is replaced with replacement."
                loc-probs)
       (format file "~s~%" (roslisp:ros-time)))))
 
+(defun merge-loc-probs (belief)
+  "Merged plan-dependent states by marginalizing out plans from conditional
+   probability distribution BELIEF as explained in RSS-HRC paper. Returns
+   probability-dist over internal states of HHMM as hashtable "
+  (let ((plan-independent-state "") (loc-probs (make-hash-table :test 'equalp)))
+    (maphash #'(lambda (state prob)
+                 (setf plan-independent-state
+                       (string (subseq state (+ 1 (position #\- state)))))
+                 (if (gethash plan-independent-state loc-probs)
+                   (setf (gethash plan-independent-state loc-probs)
+                         (+ (gethash plan-independent-state loc-probs) prob))
+                   (setf (gethash plan-independent-state loc-probs) prob)))
+             belief)
+    loc-probs))
+
 (defun write-good-plan-obs-to-csv (good-plan-observations filename)
   "Writes the good plan observations from the hashtable GOOD-PLAN-OBERSVATIONS
    to the csv-file FILENAME"

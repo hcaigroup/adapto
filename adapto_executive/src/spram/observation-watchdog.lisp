@@ -7,6 +7,7 @@
       (full-spatial-model NIL) (hmm (make-instance 'hmm)) (plan-probs NIL) ;; (merged-plan-probs NIL)
       (plan-library (generate-stpr-library)) (good-plan-observations NIL) (last-stop-pose NIL)
       (last-motion-data NIL) (last-location-observation NIL) (last-duration 0)
+      (merged-loc-probs NIL)
       ;; (plan-object-hits NIL)
       ;; (last-random-injection-time 0)
       ;;(walking-dir-publisher (roslisp:advertise "walking_dir" "geometry_msgs/Pose"))
@@ -227,7 +228,7 @@
                                 ;; (format t "_____ Monitoring Belief:~%")
                                 ;; (maphash #'print-hash-entry monitoring-belief)
 
-                                ;; WARNING!!! merge-beliefs only works in THIS DIRECTION sincen merge-belief needs a hashtable
+                                ;; WARNING!!! merge-beliefs only works in THIS DIRECTION since merge-belief needs a hashtable
                                 ;; with ":test 'equalp" at second position
                                 ;; NOTE: HERE merged-belief is ONLY USED FOR LOCATION-PREDICTION!!!! Could later be used
                                 ;; to IMPROVE BELIEF OF HMM!?
@@ -240,6 +241,12 @@
                                        (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
                                 (write-loc-probs-to-csv
                                  merged-belief "~/Desktop/loc-probs.csv")
+
+                                (setf merged-loc-probs (merge-loc-probs merged-belief))
+
+                                (format t "Merged-loc-probs:~%")
+                                (maphash #'print-hash-entry merged-loc-probs)
+                                
                                 ;; (setf merged-belief (normalize-belief (merge-beliefs
                                 ;;                                        monitoring-belief
                                 ;;                                        (normalize-belief (forward-step-belief hmm)))))
