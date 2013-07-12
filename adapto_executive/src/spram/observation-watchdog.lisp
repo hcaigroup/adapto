@@ -243,9 +243,10 @@
                                  merged-belief "~/Desktop/loc-probs.csv")
 
                                 (setf merged-loc-probs (merge-loc-probs merged-belief))
+                                (generate-loc-exps-from-prob-dist merged-loc-probs)
 
-                                (format t "Merged-loc-probs:~%")
-                                (maphash #'print-hash-entry merged-loc-probs)
+                                (show-global-structure :expectations)
+                                
                                 
                                 ;; (setf merged-belief (normalize-belief (merge-beliefs
                                 ;;                                        monitoring-belief

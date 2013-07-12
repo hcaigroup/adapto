@@ -1,5 +1,18 @@
 (in-package :ad-exe)
 
+(defun generate-loc-exps-from-prob-dist (loc-probs)
+  "This funtion creates expectations about the next estimated location of the human according
+   to the probability histogram LOC-PROBS"
+  (maphash #'(lambda (location probability)
+               (format t "Creating expectation for ~s - ~s~%" location probability)
+               (addgv :expectations (string location)
+                      (make-instance 'next-location-expectation
+                        :next-location-guess (string location)
+                        :next-location NIL
+                        :weight probability)))
+           loc-probs))
+
+
 ;; Here we define the instances of our expectations and put them into a global structure
 ;; x,y and pose of location expectations are fluents since they are subject to change
 ;; For example here: An expectation about the human beeing no more than 6 meters away from Jido
