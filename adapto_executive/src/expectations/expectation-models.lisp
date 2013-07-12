@@ -1,16 +1,22 @@
 (in-package :ad-exe)
 
 (defun generate-loc-exps-from-prob-dist (loc-probs)
-  "This funtion creates expectations about the next estimated location of the human according
-   to the probability histogram LOC-PROBS"
-  (maphash #'(lambda (location probability)
-               (format t "Creating expectation for ~s - ~s~%" location probability)
-               (addgv :expectations (string location)
-                      (make-instance 'next-location-expectation
-                        :next-location-guess (string location)
-                        :next-location NIL
-                        :weight probability)))
-           loc-probs))
+  "This funtion creates and updates expectations about the next estimated location of the human
+   according to the probability histogram LOC-PROBS"
+  (let ((*package* (find-package :ad-exe)))
+    (maphash #'(lambda (location probability)
+                 (if (isgv :expectations (intern location))
+                   (format t "Found exp ~s ~s ~%" location probability)
+                   (format t "Did NOT find exp ~s~%"  location))
+               
+                 ;; (remgv :expectations location)
+                 
+                 (addgv :expectations (intern location)
+                        (make-instance 'next-location-expectation
+                          :next-location-guess (string location)
+                          :next-location NIL
+                          :weight probability)))
+             loc-probs)))
 
 
 ;; Here we define the instances of our expectations and put them into a global structure
