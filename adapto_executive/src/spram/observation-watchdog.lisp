@@ -12,7 +12,7 @@
       ;; (last-random-injection-time 0)
       ;;(walking-dir-publisher (roslisp:advertise "walking_dir" "geometry_msgs/Pose"))
       (walking-dir-publisher NIL)
-      (monitoring-belief NIL) (merged-belief NIL)
+      (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL)
       )
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
@@ -157,10 +157,10 @@
                       (if (> loc-obs-dist 0.4)
                           (if (> (+ last-duration duration) 0.2)
                               (progn
+                                (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
                                 (add-observation-to-hmm
-                                 motion-data
+                                 location-observation
                                  objects-cache
-                                 full-spatial-model
                                  duration
                                  hmm)
                                 (setf last-duration 0)

@@ -176,18 +176,16 @@
                          prob))) belief)
     plan-probs))
 
-(defun add-observation-to-hmm (motion-tracking-data objects-cache full-spatial-model duration hmm)
+(defun add-observation-to-hmm (location-observation objects-cache duration hmm)
   "Adds an observation of the motion tracker data DATA and object recognitions OBJECTS-CACHE to the
    HMM and calculates a new belief distribution. FULL-SPATIAL-MODEL defines the locations as a set
    of locations from our knowledge-base, LAST-STOP-TIME and ROS-TIME are used to calculate durations."
-  (let ((location-observation "") (new-belief (make-hash-table)))
-    (setf location-observation  (string (label (get-most-likely-gaussian motion-tracking-data full-spatial-model))))
+  (let ((new-belief (make-hash-table)))
     ;; Append observation to end of list
     (setf (observations hmm) (reverse (cons location-observation (reverse (observations hmm)))))
     
     ;; (format t "~% >>> Saw human standing for ~3$ s at ~s with object ~s)~%"
     ;;         duration location-observation objects-cache)
-    
     ;; Here I apply a filtering for same locations that are not supposed to appear several
     ;; times after each other acounting for bad location recognition. TODO: This should actually
     ;; be accounted for in hhmm and by improving location recognition
