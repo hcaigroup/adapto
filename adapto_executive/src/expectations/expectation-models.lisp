@@ -12,6 +12,19 @@
                           :weight probability)))
              loc-probs)))
 
+(defun update-next-location (location loc-probs)
+  "This function updates all currently active location expectations with the current location
+   detection."
+  (let ((*package* (find-package :ad-exe)))
+    (maphash #'(lambda (loc prob)
+                 (declare (ignore prob))
+                 (setgv :expectations (intern loc)
+                        (make-instance 'next-location-expectation
+                          :next-location-guess (next-location-guess (getgv :expectations (intern loc)))
+                          :next-location location
+                          :weight (weight (getgv :expectations (intern loc))))
+                        )) loc-probs)))
+
 (defun generate-location-expectations ()
   "Here we define the instances of our expectations and put them into a global structure
    x,y and pose of location expectations are fluents since they are subject to change.

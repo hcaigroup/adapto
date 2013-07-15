@@ -12,7 +12,8 @@
       ;; (last-random-injection-time 0)
       ;;(walking-dir-publisher (roslisp:advertise "walking_dir" "geometry_msgs/Pose"))
       (walking-dir-publisher NIL)
-      (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL)
+      (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
+      (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
       )
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
@@ -142,14 +143,12 @@
                   ;; Calculate distance between last location observations
                   (let ((loc-obs-dist 1))
                     (unless (eq last-location-observation NIL)
-                      (setf loc-obs-dist (distance motion-data last-location-observation))
-                      ;; (format t "[loc-dist: ~2,5f]  " loc-obs-dist)
-                      )
+                      (setf loc-obs-dist (distance motion-data last-location-observation)))
                     (setf last-location-observation
                           (geometry_msgs-msg:position (geometry_msgs-msg:pose (nav_msgs-msg:pose motion-data))))
 
-                  ;; Add observation if human stood still and has turned
-                  ;;(when (has-turned (return-orientation-yaw data) last-orientation (turning-angle params))
+                    ;; Add observation if human stood still and has turned
+                    ;;(when (has-turned (return-orientation-yaw data) last-orientation (turning-angle params))
                     (when (has-turned walking-direction last-walking-direction (turning-angle params)))
                     (let  ((duration (+ last-duration (- (roslisp:ros-time) last-stop-time))))
 
@@ -157,6 +156,7 @@
                       (if (> loc-obs-dist 0.4)
                           (if (> (+ last-duration duration) 0.2)
                               (progn
+                                (setf last-semantic-location-observation location-observation)
                                 (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
                                 (add-observation-to-hmm
                                  location-observation
@@ -242,11 +242,20 @@
                                 (write-loc-probs-to-csv
                                  merged-belief "~/Desktop/loc-probs.csv")
 
-                                (setf merged-loc-probs (merge-loc-probs merged-belief))
-                                (generate-loc-exps-from-prob-dist merged-loc-probs)
-
-                                (show-global-structure :expectations)
-                                
+                                (unless (string=
+                                         location-observation
+                                         last-semantic-location-observation)
+                                  (progn
+                                    (setf merged-loc-probs (merge-loc-probs merged-belief))
+                                    (unless (eq start-flag NIL)
+                                      (update-next-location location-observation merged-loc-probs))
+                                    (format t "~s~%" (validate-expectations))
+                                    ;; New expectations are generated, overwriting the old ones
+                                    (generate-loc-exps-from-prob-dist merged-loc-probs)
+                                    (show-global-structure :expectations))
+                                    (setf start-flag 1)
+                                  )
+                              
                                 
                                 ;; (setf merged-belief (normalize-belief (merge-beliefs
                                 ;;                                        monitoring-belief
