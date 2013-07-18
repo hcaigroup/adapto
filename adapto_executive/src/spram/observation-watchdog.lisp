@@ -35,8 +35,9 @@
     (format t "~%~% --------------------------- HMM INIT DONE --------------------------------~%")
 
     (setf good-plan-observations (init-plan-good-observations-table plan-library))
-    (let (;; (params (get-real-params))
-          (params (get-morse-params)))
+    (let ((params (get-real-params))
+          ;; (params (get-morse-params))
+          )
       
       (format t "~%~% --------------------------- OBSERVATION PARAMS: --------------------------~%")
       (format t "| movent distance: ~15s                                          |~%" (movement-distance params))
@@ -218,11 +219,6 @@
                                  ;; (format t "_____ Good Observations:~%")
                                 ;; (maphash #'print-hash-entry good-plan-observations)
 
-                                ;; (format t "_____ Belief HMM:~%")
-                                ;; (maphash #'print-hash-entry (normalize-belief (forward-step-belief hmm)))
-                                ;; (format t "_____ Monitoring Belief:~%")
-                                ;; (maphash #'print-hash-entry monitoring-belief)
-
                                 ;; WARNING!!! merge-beliefs only works in THIS DIRECTION since merge-belief needs a hashtable
                                 ;; with ":test 'equalp" at second position
                                 ;; NOTE: HERE merged-belief is ONLY USED FOR LOCATION-PREDICTION!!!! Could later be used
@@ -241,19 +237,17 @@
                                          location-observation
                                          last-semantic-location-observation)
                                   (progn
-                                    (setf merged-loc-probs (merge-loc-probs merged-belief))
+                                    (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
                                     (unless (eq start-flag NIL)
                                       (update-next-location location-observation merged-loc-probs))
                                     (format t "~s~%" (validate-expectations))
                                     ;; New expectations are generated, overwriting the old ones
-                                    (generate-loc-exps-from-prob-dist merged-loc-probs)
-                                    (show-global-structure :expectations))
+                                    (generate-loc-exps-from-prob-dist merged-loc-probs))
                                     (setf start-flag 1))
                                 ;; Reset object cache only when observations has been added!
-                                (setf objects-cache NIL))) ;; When obs added, reset last-duration
+                                (setf objects-cache NIL)))
                           (progn
                             (setf last-duration (+ duration last-duration)))))))
-                  ;; reset stop-time
                   (setf last-stop-time NIL)))))
       (setf last-data data)
       (setf last-pose
