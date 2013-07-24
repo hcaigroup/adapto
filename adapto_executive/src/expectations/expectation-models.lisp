@@ -9,7 +9,8 @@
                         (make-instance 'next-location-expectation
                           :next-location-guess (string location)
                           :next-location NIL
-                          :weight probability)))
+                          :weight probability
+                          :ready-for-validation NIL)))
              loc-probs)))
 
 (defun update-next-location (location loc-probs)
@@ -22,8 +23,9 @@
                         (make-instance 'next-location-expectation
                           :next-location-guess (next-location-guess (getgv :expectations (intern loc)))
                           :next-location location
-                          :weight (weight (getgv :expectations (intern loc))))
-                        )) loc-probs)))
+                          :weight (weight (getgv :expectations (intern loc)))
+                          :ready-for-validation T)))
+             loc-probs)))
 
 (defun generate-location-expectations ()
   "Here we define the instances of our expectations and put them into a global structure

@@ -13,7 +13,8 @@
 (defclass next-location-expectation (expectation)
   ((next-location-guess :initarg :next-location-guess :accessor next-location-guess)
    (next-location :initarg :next-location :accessor next-location)
-   (weight :initarg :weight :accessor weight)))
+   (weight :initarg :weight :accessor weight)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation)))
 
 (defclass object-expectation (expectation)
   ((object :initarg :object :accessor object)
