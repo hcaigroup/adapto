@@ -63,10 +63,14 @@
 
   (defun stop-observation-watchdog ()
     "Unsubscribe from ROS topics and terminate connection to ROS."
-     (roslisp:unsubscribe sub1)
-     (roslisp:unsubscribe sub2)
-     (shutdown-ros)
-     (format t "STOPPED OBSERVATION WATCHDOG"))
+    (format t "Removing expectations global structure ...")
+    (remove-global-structure :expectations)
+    (format t "...done.~% Unsubscribing ROS topics... ")
+    (roslisp:unsubscribe sub1)
+    (roslisp:unsubscribe sub2)
+    (format t "... done.~% Shutting down ROS ...") 
+    (shutdown-ros)
+    (format t "...done.~%"))
   
   (defun update-object-detections (object-tracker-data)
     "Read from OBJECT-TRACKER-DATA ROS topic and update object state-variables if human was
