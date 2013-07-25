@@ -44,10 +44,12 @@
     0))
 
 (defmethod validate-expectation ((exp next-location-expectation))
-  "Returns weight of EXP if locations match, 0 otherwise"
-  (if (string= (next-location-guess exp) (next-location exp))
+  "If EXP not ready to validate, returns NIL. If EXP is ready to validaterReturns weight
+   of EXP if locations match, 0 otherwise"
+  (unless (eq (ready-for-validation exp) NIL)
+    (if (string= (next-location-guess exp) (next-location exp))
       (weight exp)
-      0))
+      0)))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
