@@ -5,7 +5,7 @@
    according to the probability histogram LOC-PROBS"
   (let ((*package* (find-package :ad-exe)))
     (maphash #'(lambda (location probability)
-                 (addgv :expectations (intern (concatenate 'string location "-future"))
+                 (addgv :activity-expectations (intern (concatenate 'string location "-future"))
                         (make-instance 'next-location-expectation
                           :next-location-guess (string location)
                           :next-location NIL
@@ -19,11 +19,11 @@
   (let ((*package* (find-package :ad-exe)))
     (maphash #'(lambda (loc prob)
                  (declare (ignore prob))
-                 (addgv :expectations (intern loc)
+                 (addgv :activity-expectations (intern loc)
                         (make-instance 'next-location-expectation
-                          :next-location-guess (next-location-guess (getgv :expectations (intern (concatenate 'string loc "-future"))))
+                          :next-location-guess (next-location-guess (getgv :activity-expectations (intern (concatenate 'string loc "-future"))))
                           :next-location location
-                          :weight (weight (getgv :expectations (intern (concatenate 'string loc "-future"))))
+                          :weight (weight (getgv :activity-expectations (intern (concatenate 'string loc "-future"))))
                           :ready-for-validation T)))
              loc-probs)))
 

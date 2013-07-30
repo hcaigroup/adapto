@@ -144,6 +144,6 @@
 (def-top-level-plan garching-minimal()
   ;; (start-statevar-update)
   (startup-ros)
-  (create-global-structure :expectations)
+  (create-global-structure :activity-expectations)
   ;; (generate-location-expectations)
   (start-observation-watchdog))
