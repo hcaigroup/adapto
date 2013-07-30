@@ -31,7 +31,8 @@
   "Here we define the instances of our expectations and put them into a global structure
    x,y and pose of location expectations are fluents since they are subject to change.
    For example here: An expectation about the human beeing no more than 6 meters away from Jido"
-  (create-global-structure :expectations)
+  ;; (create-global-structure :expectations)
+  (init-expectations)
   (addgv :expectations 'louis-near-james (make-instance 'position-expectation
                                     :area (make-instance 'moving-circle
                                             :radius 2
@@ -72,35 +73,35 @@
   )
 
 (defun generate-object-expectations ()
-   (create-global-structure :expectations)
-   (addgv :expectations 'red-cube-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'red_cube)))
-            :flexible NIL))
+  (init-expectations)
+  (addgv :expectations 'red-cube-static
+         (make-instance 'object-expectation
+           :object (make-instance 'thing
+                     :pose (fl-funcall #'pose
+                                       (getgv :kitchen-object 'red_cube)))
+           :flexible NIL))
    
-   (addgv :expectations 'cyan-cube-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'cyan_cube)))
-            :flexible NIL))
+  (addgv :expectations 'cyan-cube-static
+         (make-instance 'object-expectation
+           :object (make-instance 'thing
+                     :pose (fl-funcall #'pose
+                                       (getgv :kitchen-object 'cyan_cube)))
+           :flexible NIL))
 
-   (addgv :expectations 'green-cube-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'green_cube)))
-            :flexible NIL))
+  (addgv :expectations 'green-cube-static
+         (make-instance 'object-expectation
+           :object (make-instance 'thing
+                     :pose (fl-funcall #'pose
+                                       (getgv :kitchen-object 'green_cube)))
+           :flexible NIL))
 
-   (addgv :expectations 'pink-cube-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'pink_cube)))
-            :flexible NIL))
-   
+  (addgv :expectations 'pink-cube-static
+         (make-instance 'object-expectation
+           :object (make-instance 'thing
+                     :pose (fl-funcall #'pose
+                                       (getgv :kitchen-object 'pink_cube)))
+           :flexible NIL))
+  
   (addgv :expectations 'yellow-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
@@ -108,15 +109,17 @@
                                        (getgv :kitchen-object 'yellow_cube)))
            :flexible NIL))
   
-   (addgv :expectations 'purple-cube-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'purple_cube)))
-            :flexible NIL)))
+  (addgv :expectations 'purple-cube-static
+         (make-instance 'object-expectation
+           :object (make-instance 'thing
+                     :pose (fl-funcall #'pose
+                                       (getgv :kitchen-object 'purple_cube)))
+           :flexible NIL)))
 
 (defun clean-expectations ()
-  (clear-global-structure :expectations))
+  (clear-global-structure :expectations)
+  (clear-global-structure :activity-expectations)
+  )
 
 ;; This function defines the structure of our expectations-network
 (defun init-expectations ()

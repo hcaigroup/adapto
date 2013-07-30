@@ -46,7 +46,8 @@
 ;; Navigate to 3 points and monitor time of navigation-action
 (def-top-level-plan navigation-task()
   (start-statevar-update)
-  (create-global-structure :expectations)
+  (init-expectations)
+  
   ;; (generate-location-expectations)
   
   (with-designators 
@@ -76,12 +77,13 @@
         (cram-process-modules:pm-execute :navigation loc2-desig)
         (sleep 2)
         (cram-process-modules:pm-execute :navigation loc3-desig))
-      (start-expectation-validation))))
+      ;; (start-expectation-validation)
+      )))
 
 ;; Navigate to 3 points in apartment and monitor time of navigation-action
 (def-top-level-plan apartment-task()
   (start-statevar-update)
-  (create-global-structure :expectations)
+  (init-expectations)
   ;; (generate-location-expectations)
   
   (with-designators 
@@ -114,18 +116,19 @@
         (sleep 2)
         (cram-process-modules:pm-execute :navigation loc2-desig)
         (sleep 2)
-        (cram-process-modules:pm-execute :navigation loc5-desig)
+        (cram-process-modules:pm-execute :navigation loc3-desig)
         (sleep 2)
-        (cram-process-modules:pm-execute :navigation loc7-desig))
+        (cram-process-modules:pm-execute :navigation loc4-desig))
       
-      (start-expectation-validation))))
+      ;; (start-expectation-validation)
+      )))
 
 ;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
 ;; probabilities about human task execution and use those to generate expectations
 (def-top-level-plan garching-task()
   ;; (start-statevar-update)
   (startup-ros)
-  (create-global-structure :expectations)
+  (init-expectations)
   ;; (generate-location-expectations)
   
   (with-designators 
@@ -144,6 +147,7 @@
 (def-top-level-plan garching-minimal()
   ;; (start-statevar-update)
   (startup-ros)
-  (create-global-structure :activity-expectations)
+  ;; (create-global-structure :activity-expectations)
+  (init-expectations)
   ;; (generate-location-expectations)
   (start-observation-watchdog))
