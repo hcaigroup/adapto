@@ -5,6 +5,11 @@
   (when args
     (/ (apply #'+ args) (length args))))
 
+;; helper function to calculate the szm of a list of numbers
+(defun sum (args)
+  (when args
+    (apply #'+ args)))
+
 ;; helper funtion gets a list of different values including NIL and
 ;; returns a new list with all NILs removed
 (defun get-rid-of-NILs (list)
@@ -25,7 +30,7 @@
       (setf activity-normalities (map-global-structure 'validate-expectation :activity-expectations)))
     
     (format t "Exp-normalities: ~s~%" (average expectation-normalities) )
-    (format t "Activity-normalities: ~s~%" (average (get-rid-of-NILs activity-normalities)) )))
+    (format t "Activity-normalities: ~s~%" (sum (get-rid-of-NILs activity-normalities)) )))
 
 ;; DISABLED due to new expectations structure
 ;; Continual validation of expectations every 2 seconds
