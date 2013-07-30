@@ -117,3 +117,8 @@
 
 (defun clean-expectations ()
   (clear-global-structure :expectations))
+
+;; This function defines the structure of our expectations-network
+(defun init-expectations ()
+  (create-global-structure :expectations)
+  (create-global-structure :activity-expectations))
