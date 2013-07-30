@@ -21,16 +21,10 @@
 
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
-  (let  ((expectation-normalities NIL)
-          (activity-normalities NIL))
-
-    (unless (eq (is-global-structure :expectations ) NIL)
-      (setf expectation-normalities (map-global-structure 'validate-expectation :expectations)))
-    (unless (eq (is-global-structure :activity-expectations) NIL)
-      (setf activity-normalities (map-global-structure 'validate-expectation :activity-expectations)))
-    
+  (let  ((expectation-normalities (map-global-structure 'validate-expectation :expectations))
+          (activity-normalities (map-global-structure 'validate-expectation :activity-expectations) ))
     (format t "Exp-normalities: ~s~%" (average expectation-normalities) )
-    (format t "Activity-normalities: ~s~%" (sum (get-rid-of-NILs activity-normalities)) )))
+    (format t "Activity-normalities: ~s~%" (sum (get-rid-of-NILs activity-normalities)))))
 
 ;; DISABLED due to new expectations structure
 ;; Continual validation of expectations every 2 seconds
