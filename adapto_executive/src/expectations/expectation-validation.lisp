@@ -21,10 +21,17 @@
 
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
-  (let  ((expectation-normalities (map-global-structure 'validate-expectation :expectations))
-          (activity-normalities (map-global-structure 'validate-expectation :activity-expectations) ))
-    (format t "Exp-normalities: ~s~%" (average expectation-normalities) )
-    (format t "Activity-normalities: ~s~%" (sum (get-rid-of-NILs activity-normalities)))))
+  (let  ((robot-navigation-normalities (map-global-structure 'validate-expectation :robot-navigation-expectations))
+         (world-physical-normalities (map-global-structure 'validate-expectation :world-physical-expectations))
+         (object-physical-normalities (map-global-structure 'validate-expectation :object-physical-expectations))
+         (human-duration-normalities (map-global-structure 'validate-expectation :human-duration-expectations))
+         (human-activity-normalities (map-global-structure 'validate-expectation :human-activity-expectations)))
+    (format t "Normalities:")
+    (format t "Robot navigation: ~s~%" (average robot-navigation-normalities))
+    (format t "World physical: ~s~%" (average world-physical-normalities))
+    (format t "Object physical: ~s~%" (average object-physical-normalities))
+    (format t "Human durations: ~s~%" (average human-duration-normalities))
+    (format t "Human activity: ~s~%" (sum (get-rid-of-NILs human-activity-normalities)))))
 
 ;; DISABLED due to new expectations structure
 ;; Continual validation of expectations every 2 seconds

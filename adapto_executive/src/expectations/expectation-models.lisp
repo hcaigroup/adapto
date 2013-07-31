@@ -5,7 +5,7 @@
    according to the probability histogram LOC-PROBS"
   (let ((*package* (find-package :ad-exe)))
     (maphash #'(lambda (location probability)
-                 (addgv :activity-expectations (intern (concatenate 'string location "-future"))
+                 (addgv :human-activity-expectations (intern (concatenate 'string location "-future"))
                         (make-instance 'next-location-expectation
                           :next-location-guess (string location)
                           :next-location NIL
@@ -19,11 +19,11 @@
   (let ((*package* (find-package :ad-exe)))
     (maphash #'(lambda (loc prob)
                  (declare (ignore prob))
-                 (addgv :activity-expectations (intern loc)
+                 (addgv :human-activity-expectations (intern loc)
                         (make-instance 'next-location-expectation
-                          :next-location-guess (next-location-guess (getgv :activity-expectations (intern (concatenate 'string loc "-future"))))
+                          :next-location-guess (next-location-guess (getgv :human-activity-expectations (intern (concatenate 'string loc "-future"))))
                           :next-location location
-                          :weight (weight (getgv :activity-expectations (intern (concatenate 'string loc "-future"))))
+                          :weight (weight (getgv :human-activity-expectations (intern (concatenate 'string loc "-future"))))
                           :ready-for-validation T)))
              loc-probs)))
 
@@ -31,9 +31,8 @@
   "Here we define the instances of our expectations and put them into a global structure
    x,y and pose of location expectations are fluents since they are subject to change.
    For example here: An expectation about the human beeing no more than 6 meters away from Jido"
-  ;; (create-global-structure :expectations)
   (init-expectations)
-  (addgv :expectations 'louis-near-james (make-instance 'position-expectation
+  (addgv :world-physical-expectations 'louis-near-james (make-instance 'position-expectation
                                     :area (make-instance 'moving-circle
                                             :radius 2
                                             :x (fl-funcall #'(lambda (fl-x)
@@ -44,7 +43,7 @@
                                                            (getgv :robot 'james)))
                                     :pose (fl-funcall #'pose (getgv :human 'louis))))
 
-  ;; (addgv :expectations 'louis-near-red-cube (make-instance 'position-expectation
+  ;; (addgv :world-physical-expectations 'louis-near-red-cube (make-instance 'position-expectation
   ;;                                             :area (make-instance 'moving-circle
   ;;                                                     :radius 5
   ;;                                                     :x (fl-funcall #'(lambda (fl-x)
@@ -58,7 +57,7 @@
   ;;                                                                    (getgv :kitchen-object 'red_cube)))
   ;;                                             :pose (fl-funcall #'pose (getgv :human 'louis))))
   
-  ;; (addgv :expectations 'louis-near-desk (make-instance 'position-expectation
+  ;; (addgv :world-physical-expectations 'louis-near-desk (make-instance 'position-expectation
   ;;                                             :area (make-instance 'moving-circle
   ;;                                                     :radius 5
   ;;                                                     :x (fl-funcall #'(lambda (fl-x)
@@ -74,42 +73,42 @@
 
 (defun generate-object-expectations ()
   (init-expectations)
-  (addgv :expectations 'red-cube-static
+  (addgv :object-physical-expectations 'red-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
                                        (getgv :kitchen-object 'red_cube)))
            :flexible NIL))
    
-  (addgv :expectations 'cyan-cube-static
+  (addgv :object-physical-expectations 'cyan-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
                                        (getgv :kitchen-object 'cyan_cube)))
            :flexible NIL))
 
-  (addgv :expectations 'green-cube-static
+  (addgv :object-physical-expectations 'green-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
                                        (getgv :kitchen-object 'green_cube)))
            :flexible NIL))
 
-  (addgv :expectations 'pink-cube-static
+  (addgv :object-physical-expectations 'pink-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
                                        (getgv :kitchen-object 'pink_cube)))
            :flexible NIL))
   
-  (addgv :expectations 'yellow-cube-static
+  (addgv :object-physical-expectations 'yellow-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
                                        (getgv :kitchen-object 'yellow_cube)))
            :flexible NIL))
   
-  (addgv :expectations 'purple-cube-static
+  (addgv :object-physical-expectations 'purple-cube-static
          (make-instance 'object-expectation
            :object (make-instance 'thing
                      :pose (fl-funcall #'pose
@@ -117,11 +116,17 @@
            :flexible NIL)))
 
 (defun clean-expectations ()
-  (clear-global-structure :expectations)
-  (clear-global-structure :activity-expectations)
+  (clear-global-structure :robot-navigation-expectations)
+  (clear-global-structure :world-physical-expectations)
+  (clear-global-structure :object-physcial-expectations)
+  (clear-global-structure :human-duration-expectations)
+  (clear-global-structure :human-activity-expectations)
   )
 
 ;; This function defines the structure of our expectations-network
 (defun init-expectations ()
-  (create-global-structure :expectations)
-  (create-global-structure :activity-expectations))
+  (create-global-structure :robot-navigation-expectations)
+  (create-global-structure :world-physical-expectations)
+  (create-global-structure :object-physical-expectations)
+  (create-global-structure :human-duration-expectations)
+  (create-global-structure :human-activity-expectations))
