@@ -1,5 +1,17 @@
 (in-package :ad-exe)
 
+(defun generate-duration-exp (location-name max-expected-duration)
+  "This function generates a duration prob for the location LOCATION-NAME with
+   MAX-EXPECTED-DURATION. Only one duration expectation is allowed, so global
+   structure gets cleared before new durations are added."
+  (let ((*package* (find-package :ad-exe)))
+    (clear-global-structure :human-duration-expectations)
+    (addgv :human-duration-expectations (intern location-name)
+           (make-instance 'duration-expectation
+             :location-name (string location-name)
+             :max-expected-duration max-expected-duration
+             :time-entered (get-universal-time)))))
+
 (defun generate-loc-exps-from-prob-dist (loc-probs)
   "This funtion creates and updates expectations about the next estimated location of the human
    according to the probability histogram LOC-PROBS"

@@ -97,7 +97,7 @@
                 (setf objects-cache (cons object-name objects-cache))))))))))
   
   ;; Parameters. Times are in seconds, distance is in meters
-  (let ((output-time 0.5) 
+  (let ((output-time 2) 
         (params (get-real-params))
         (motion-data NIL)
         (last-orientation 0)
@@ -116,6 +116,7 @@
            (setf last-output-time (roslisp:ros-time))
            (setf plan-probs (calculate-plan-probabilities (belief hmm)))
            (unless (eq plan-probs NIL) (visualize-plan-probs plan-probs))
+           (format t "~s~%" (validate-expectations))
            ;; (unless (eq plan-probs NIL)
            ;;   (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv"))
            ;; (unless (eq merged-belief NIL)
@@ -244,8 +245,9 @@
                                     (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
                                     (unless (eq start-flag NIL)
                                       (update-next-location location-observation merged-loc-probs))
-                                    (format t "~s~%" (validate-expectations))
-                                    ;; New expectations are generated, overwriting the old ones
+                                    ;; (format t "~s~%" (validate-expectations))
+                                    ;; TODO TODO TODO: Instead of 3 secs, get REAL max-duration from STPR
+                                    (generate-duration-exp location-observation (float 3))
                                     (generate-loc-exps-from-prob-dist merged-loc-probs))
                                     (setf start-flag 1))
                                 ;; Reset object cache only when observations has been added!
