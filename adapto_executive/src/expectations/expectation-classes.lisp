@@ -16,6 +16,12 @@
    (weight :initarg :weight :accessor weight)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation)))
 
+(defclass duration-expectation (expectation)
+  ((location-name :initarg :location-name :accessor location-name)
+   (max-expected-duration :initarg :max-expected-duration :accessor max-expected-duration)
+   (time-entered :initarg :time-entered :accessor time-entered)
+   (time-left :initarg :time-left :accessor time-left)))
+
 (defclass object-expectation (expectation)
   ((object :initarg :object :accessor object)
    (flexible :initarg :flexible :accessor flexible)))
@@ -50,6 +56,13 @@
     (if (string= (next-location-guess exp) (next-location exp))
       (weight exp)
       0)))
+
+(defmethod validate-expectation ((exp duration-expectation))
+  "Return 1 if current time - start-time does not exceed max-expected duration,
+   otherwise return 0 (TODO: maybe make transition softer by linear descent)"
+  (if (> (- (get-universal-time) (time-entered exp)) (max-expected-duration exp))
+      0
+      1))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
