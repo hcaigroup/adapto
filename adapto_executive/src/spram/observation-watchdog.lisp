@@ -251,7 +251,12 @@
                                       (update-next-location location-observation merged-loc-probs))
                                     ;; (format t "~s~%" (validate-expectations))
                                     ;; TODO TODO TODO: Instead of 3 secs, get REAL max-duration from STPR
-                                    (generate-duration-exp location-observation (float 3))
+                                    (generate-duration-exp
+                                     location-observation
+                                     (gethash (string location-observation) max-loc-duration-table))
+                                    (format t "I guess human will stay maximally ~s s at ~s~%"
+                                            (gethash (string location-observation) max-loc-duration-table)
+                                            location-observation)
                                     (generate-loc-exps-from-prob-dist merged-loc-probs))
                                     (setf start-flag 1))
                                 ;; Reset object cache only when observations has been added!
