@@ -14,12 +14,16 @@
       (walking-dir-publisher NIL)
       (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
+      (max-loc-duration-table NIL)
       )
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
     "Initialize SPRAM module by generating a spatial model, unique string labels and init the hmm"
     (setf stpr-library plan-library)
     (setf loc-str-table (generate-location-string-table stpr-library))
+    (setf max-loc-duration-table (get-max-durations-from-stpr-lib stpr-library))
+    (format t "Max-Durations table:~%")
+    (maphash #'print-hash-entry max-loc-duration-table)
     (setf full-spatial-model (create-full-spatial-model stpr-library loc-str-table))
     
     (format t "~%~% --------------------------- HMM INIT START--------------------------------~%")

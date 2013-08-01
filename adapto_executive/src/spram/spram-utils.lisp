@@ -437,3 +437,17 @@ is replaced with replacement."
     (geometry_msgs-msg:y
      (geometry_msgs-msg:position
       (geometry_msgs-msg:pose (nav_msgs-msg:pose pose-data)))))
+
+(defun get-max-durations-from-stpr-lib (stpr-library)
+  "Traverses stpr-libary and generates hashtable including maximum duration for
+   each location found in STPRs"
+  (let ((max-durations-table (make-hash-table :test 'equalp)))
+    (dolist (stpr (stpr-list stpr-library))
+      (dolist (location (st-list stpr))
+        (if (eq (gethash (location-label location) max-durations-table) NIL)
+          (setf (gethash (location-label location) max-durations-table)
+                (float (duration location)))
+          (when (> (duration location) (gethash (location-label location) max-durations-table)) 
+            (setf (gethash (location-label location) max-durations-table)
+              (float (duration location)))))))
+    max-durations-table))
