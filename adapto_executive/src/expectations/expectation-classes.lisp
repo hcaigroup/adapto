@@ -60,9 +60,16 @@
 (defmethod validate-expectation ((exp duration-expectation))
   "Return 1 if current time - start-time does not exceed max-expected duration,
    otherwise return 0 (TODO: maybe make transition softer by linear descent)"
-  (if (> (- (get-universal-time) (time-entered exp)) (max-expected-duration exp))
-      0
-      1))
+  (let ((delta-t (- (get-universal-time) (time-entered exp))))
+    (if (> delta-t (max-expected-duration exp))
+      (if (> delta-t (* 2 (max-expected-duration exp)))
+        0
+        (- 1 (/
+              (-
+               delta-t
+               (max-expected-duration exp))
+              (max-expected-duration exp))))
+      1)))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
