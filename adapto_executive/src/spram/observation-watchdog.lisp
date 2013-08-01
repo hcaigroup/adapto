@@ -15,6 +15,7 @@
       (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
       (max-loc-duration-table NIL)
+      (current-location-observation NIL)
       )
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
@@ -137,6 +138,11 @@
           (if (< v-dist (movement-distance params))
               (progn
                 ;; Human just stopped => save timestamp and motion-data
+                ;; Current location observation is assigned when human stops moving, needed for
+                ;; duration expectations
+                (unless (eq motion-data NIL)
+                  (setf current-location-observation
+                        (string (label (get-most-likely-gaussian motion-data full-spatial-model)))))
                 (when (eq last-stop-time NIL)
                   (setf last-stop-time (roslisp:ros-time))
                   (setf last-motion-data motion-data)
@@ -252,11 +258,11 @@
                                     ;; (format t "~s~%" (validate-expectations))
                                     ;; TODO TODO TODO: Instead of 3 secs, get REAL max-duration from STPR
                                     (generate-duration-exp
-                                     location-observation
-                                     (gethash (string location-observation) max-loc-duration-table))
+                                     current-location-observation
+                                     (gethash (string current-location-observation) max-loc-duration-table))
                                     (format t "I guess human will stay maximally ~s s at ~s~%"
-                                            (gethash (string location-observation) max-loc-duration-table)
-                                            location-observation)
+                                            (gethash (string current-location-observation) max-loc-duration-table)
+                                            current-location-observation)
                                     (generate-loc-exps-from-prob-dist merged-loc-probs))
                                     (setf start-flag 1))
                                 ;; Reset object cache only when observations has been added!
