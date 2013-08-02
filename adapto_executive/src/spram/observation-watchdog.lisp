@@ -9,14 +9,12 @@
       (last-motion-data NIL) (last-location-observation NIL) (last-duration 0)
       (merged-loc-probs NIL)
       ;; (plan-object-hits NIL)
-      ;; (last-random-injection-time 0)
       ;;(walking-dir-publisher (roslisp:advertise "walking_dir" "geometry_msgs/Pose"))
       (walking-dir-publisher NIL)
       (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
       (max-loc-duration-table NIL)
-      (current-location-observation NIL)
-      )
+      (current-location-observation NIL))
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
     "Initialize SPRAM module by generating a spatial model, unique string labels and init the hmm"
@@ -101,13 +99,10 @@
               (unless  (member object-name objects-cache)
                 (setf objects-cache (cons object-name objects-cache))))))))))
   
-  ;; Parameters. Times are in seconds, distance is in meters
-  (let ((output-time 2) 
+  (let ((output-time 2) ;; in seconds
         (params (get-real-params))
-        (motion-data NIL)
-        (last-orientation 0)
-        (walking-direction 0)
-        (last-walking-direction 0)
+        ;; Init variables
+        (motion-data NIL) (last-orientation 0) (walking-direction 0) (last-walking-direction 0)
         (last-data NIL))
     ;; Callback-function of watchdog
     (defun observe-human-motion (data)
@@ -132,144 +127,122 @@
         ;; Check if human has moved every movement-time seconds
         (when (> deltaT (human-movement-time params))
           (setf last-human-reading (std_msgs-msg:stamp (nav_msgs-msg:header data)))
-
           (setf v-dist (distance data last-pose))
           (setf last-stop-pose data)
+
           (if (< v-dist (movement-distance params))
-              (progn
-                ;; Human just stopped => save timestamp and motion-data
-                ;; Current location observation is assigned when human stops moving, needed for
-                ;; duration expectations
-                (unless (eq motion-data NIL)
-                  (setf current-location-observation
-                        (string (label (get-most-likely-gaussian motion-data full-spatial-model)))))
-                (when (eq last-stop-time NIL)
-                  (setf last-stop-time (roslisp:ros-time))
-                  (setf last-motion-data motion-data)
-                  (setf motion-data data)))
-              (progn
-                (setf walking-direction (get-walking-direction-yaw data last-data))
-                (post-walking-direction walking-dir-publisher data walking-direction)
-                ;; Human starts moving again => calculate time and add an observation
-                (unless (eq last-stop-time NIL)
-                  ;; ############################################################################
-                  ;; Here we put the heuristics to improve location detections...
-                  ;; TODO: Generalize and seperate functionality from MAIN  (after RSS Deadline)
-                  ;; ############################################################################
-
-                  ;; Calculate distance between last location observations
-                  (let ((loc-obs-dist 1))
-                    (unless (eq last-location-observation NIL)
-                      (setf loc-obs-dist (distance motion-data last-location-observation)))
-                    (setf last-location-observation
-                          (geometry_msgs-msg:position (geometry_msgs-msg:pose (nav_msgs-msg:pose motion-data))))
-
-                    ;; Add observation if human stood still and has turned
-                    ;;(when (has-turned (return-orientation-yaw data) last-orientation (turning-angle params))
-                    (when (has-turned walking-direction last-walking-direction (turning-angle params)))
-                    (let  ((duration (+ last-duration (- (roslisp:ros-time) last-stop-time))))
-
-                    ;; When observation spatially ignored, add duration of last obervation to current one
-                      (if (> loc-obs-dist 0.4)
+            (progn
+              ;; Human just stopped => save timestamp and motion-data
+              ;; Current location observation when human stops moving for duration expectations
+              (unless (eq motion-data NIL)
+                (setf current-location-observation
+                      (string (label (get-most-likely-gaussian motion-data full-spatial-model)))))
+              (when (eq last-stop-time NIL)
+                (setf last-stop-time (roslisp:ros-time))
+                (setf last-motion-data motion-data)
+                (setf motion-data data)))
+            (progn
+              (setf walking-direction (get-walking-direction-yaw data last-data))
+              (post-walking-direction walking-dir-publisher data walking-direction)
+              ;; Human starts moving again => calculate time and add an observation
+              (unless (eq last-stop-time NIL)
+                ;; ############################################################################
+                ;; Here we put the heuristics to improve location detections...
+                ;; TODO: Generalize and seperate functionality from MAIN  (after RSS Deadline)
+                ;; ############################################################################
+                
+                ;; Calculate distance between last location observations
+                (let ((loc-obs-dist 1))
+                  (unless (eq last-location-observation NIL)
+                    (setf loc-obs-dist (distance motion-data last-location-observation)))
+                  (setf last-location-observation
+                        (geometry_msgs-msg:position (geometry_msgs-msg:pose (nav_msgs-msg:pose motion-data))))
+                  
+                  ;; Add observation if human stood still and has turned
+                  ;;(when (has-turned (return-orientation-yaw data) last-orientation (turning-angle params))
+                  (when (has-turned walking-direction last-walking-direction (turning-angle params)))
+                  (let  ((duration (+ last-duration (- (roslisp:ros-time) last-stop-time))))
+                    
+                    ;; When observation spatially ignored, add duration of last obervation to current initialize-one-of-each
+                    (if (> loc-obs-dist 0.4)
                           (if (> (+ last-duration duration) 0.2)
-                              (progn
-                                (setf last-semantic-location-observation location-observation)
-                                (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
-                                (add-observation-to-hmm
-                                 location-observation
-                                 objects-cache
-                                 duration
-                                 hmm)
-                                (setf last-duration 0)
-                                (setf plan-probs (calculate-plan-probabilities (belief hmm)))
+                            (progn
+                              (setf last-semantic-location-observation location-observation)
+                              (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
+                              (add-observation-to-hmm
+                               location-observation
+                               objects-cache
+                               duration
+                               hmm)
+                              (setf last-duration 0)
+                              (setf plan-probs (calculate-plan-probabilities (belief hmm)))
+                              
+                              ;; Incorporate object detections
+                              ;; (setf plan-object-hits (calculate-object-confidence-without-locations plan-library objects-cache last-motion-data full-spatial-model))
+                              ;; (setf plan-object-hits (weight-belief-distribution-with-variance plan-object-hits))
+                              ;; (setf merged-plan-probs (weight-beliefs plan-probs plan-object-hits))
+                              
+                              (visualize-plan-probs plan-probs)
+                              ;; (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv")
+                              
+                              ;; TODOTODOTODO: Get monitoring together in own functions!!!!
+                              ;; (write-loc-probs-to-csv
+                              ;;  (normalize-belief (forward-step-belief hmm)) "/home/kargm/Desktop/loc-probs.csv")
+                              (setf last-orientation (return-orientation-yaw data))
+                              (setf last-walking-direction walking-direction)
+                              (setf good-plan-observations (get-good-observations
+                                                            good-plan-observations
+                                                            plan-probs
+                                                            0.20
+                                                            motion-data
+                                                            last-motion-data
+                                                            loc-str-table
+                                                            plan-library))
+                              ;; (write-good-plan-obs-to-csv good-plan-observations "~/Desktop/good-plan-obs.csv")
+                              (setf monitoring-belief
+                                    (predict-locations
+                                     good-plan-observations
+                                     plan-library
+                                     plan-probs
+                                     loc-str-table))
+                              
+                              ;; (format t "_____ Good Observations:~%")
+                              ;; (maphash #'print-hash-entry good-plan-observations)
+                              
+                              ;; WARNING!!! merge-beliefs only works in THIS DIRECTION since merge-belief needs a hash-table
+                              ;; with ":test 'equalp" at second position
+                              ;; NOTE: HERE merged-belief is ONLY USED FOR LOCATION-PREDICTION!!!! Could later be used
+                              ;; to IMPROVE BELIEF OF HMM!?
 
-                                ;; Incorporate object detections
-                                ;; (setf plan-object-hits (calculate-object-confidence-without-locations plan-library objects-cache motion-data full-spatial-model))
-                                ;; (setf plan-object-hits (weight-belief-distribution-with-variance plan-object-hits))
-                                ;; (setf merged-plan-probs (weight-beliefs plan-probs plan-object-hits))
+                              ;; (unless (eq merged-belief NIL)
+                              ;;   (write-loc-probs-to-csv
+                              ;;    merged-belief "~/Desktop/loc-probs.csv"))
+                              (setf merged-belief
+                                    (normalize-belief
+                                     (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
+                              ;; (write-loc-probs-to-csv
+                              ;;  merged-belief "~/Desktop/loc-probs.csv")
 
-                                (visualize-plan-probs plan-probs)
-                                ;; (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv")
-
-                                ;; TEST: FEEDBACK LOOP for object detections !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                ;; (format t "Belief before:~%")
-                                ;; (maphash #'print-hash-entry (belief hmm))
-                                ;; (setf hmm (make-instance 'hmm :belief (normalize-belief (bias-belief-with-plan-probs (belief hmm) merged-plan-probs))
-                                ;;                          :start-belief (start-belief hmm)
-                                ;;                          :state-transitions (state-transitions hmm)
-                                ;;                          :observation-probabilities (observation-probabilities hmm)))
-                                ;; (format t "Belief after:~%")
-                                ;; (maphash #'print-hash-entry (belief hmm))
-                                
-                                ;; (format t "Plan Probs:~%")
-                                ;; (maphash #'print-hash-entry plan-probs)
-                                ;; (format t "Object Hits:~%")
-                                ;; (maphash #'print-hash-entry plan-object-hits)
-                                ;; (format t "Merged Plan Probs:~%")
-                                ;; (maphash #'print-hash-entry merged-plan-probs)
-                                ;; (format t "~%Weighted Object Hits:~%")
-                                ;; (maphash #'print-hash-entry (weight-belief-distribution-with-variance plan-object-hits))
-
-                                ;; TODOTODOTODO: Get monitoring together in own functions!!!!
-                                ;; (write-loc-probs-to-csv
-                                ;;  (normalize-belief (forward-step-belief hmm)) "/home/kargm/Desktop/loc-probs.csv")
-                                (setf last-orientation (return-orientation-yaw data))
-                                (setf last-walking-direction walking-direction)
-                                (setf good-plan-observations (get-good-observations
-                                                              good-plan-observations
-                                                              plan-probs
-                                                              0.20
-                                                              motion-data
-                                                              last-motion-data
-                                                              loc-str-table
-                                                              plan-library))
-                                ;; (write-good-plan-obs-to-csv good-plan-observations "~/Desktop/good-plan-obs.csv")
-                                (setf monitoring-belief
-                                      (predict-locations
-                                       good-plan-observations
-                                       plan-library
-                                       plan-probs
-                                       loc-str-table))
-                                
-                                 ;; (format t "_____ Good Observations:~%")
-                                ;; (maphash #'print-hash-entry good-plan-observations)
-
-                                ;; WARNING!!! merge-beliefs only works in THIS DIRECTION since merge-belief needs a hashtable
-                                ;; with ":test 'equalp" at second position
-                                ;; NOTE: HERE merged-belief is ONLY USED FOR LOCATION-PREDICTION!!!! Could later be used
-                                ;; to IMPROVE BELIEF OF HMM!?
-
-                                ;; (unless (eq merged-belief NIL)
-                                ;;   (write-loc-probs-to-csv
-                                ;;    merged-belief "~/Desktop/loc-probs.csv"))
-                                (setf merged-belief
-                                      (normalize-belief
-                                       (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
-                                ;; (write-loc-probs-to-csv
-                                ;;  merged-belief "~/Desktop/loc-probs.csv")
-
-                                (unless (string=
-                                         location-observation
-                                         last-semantic-location-observation)
-                                  (progn
-                                    (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
-                                    (unless (eq start-flag NIL)
-                                      (update-next-location location-observation merged-loc-probs))
-                                    ;; (format t "~s~%" (validate-expectations))
-                                    ;; TODO TODO TODO: Instead of 3 secs, get REAL max-duration from STPR
-                                    (generate-duration-exp
-                                     current-location-observation
-                                     (gethash (string current-location-observation) max-loc-duration-table))
-                                    (format t "I guess human will stay maximally ~s s at ~s~%"
-                                            (gethash (string current-location-observation) max-loc-duration-table)
-                                            current-location-observation)
-                                    (generate-loc-exps-from-prob-dist merged-loc-probs))
-                                    (setf start-flag 1))
-                                ;; Reset object cache only when observations has been added!
-                                (setf objects-cache NIL)))
+                              (unless (string=
+                                       location-observation
+                                       last-semantic-location-observation)
+                                (progn
+                                  (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
+                                  (unless (eq start-flag NIL)
+                                    (update-next-location location-observation merged-loc-probs))
+                                  (generate-duration-exp
+                                   current-location-observation
+                                   (gethash (string current-location-observation) max-loc-duration-table))
+                                  (format t "I guess human will stay maximally ~s s at ~s~%"
+                                          (gethash (string current-location-observation) max-loc-duration-table)
+                                          current-location-observation)
+                                  (generate-loc-exps-from-prob-dist merged-loc-probs))
+                                (setf start-flag 1))
+                              ;; Reset object cache when observations was added
+                              (setf objects-cache NIL)))
                           (progn
                             (setf last-duration (+ duration last-duration)))))))
-                  (setf last-stop-time NIL)))))
+              (setf last-stop-time NIL)))))
       (setf last-data data)
       (setf last-pose
             (geometry_msgs-msg:position (geometry_msgs-msg:pose (nav_msgs-msg:pose data)))))))

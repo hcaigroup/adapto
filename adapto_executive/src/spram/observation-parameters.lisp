@@ -7,6 +7,7 @@
    (human-movement-time :initarg :human-movement-time :accessor human-movement-time)))
 
 (defun get-morse-params ()
+  ;; times in secs, distance in meters
   (let ((params (make-instance 'parameters
                   :objects-ros-topic "/james/semantic_camera"
                   :movement-distance 0.01
@@ -15,6 +16,7 @@
     params))
 
 (defun get-real-params ()
+  ;; times in secs, distance in meters
   (let ((params (make-instance 'parameters
                   :objects-ros-topic "/objects_relative_to_map"
                   :movement-distance 0.025
