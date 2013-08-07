@@ -20,22 +20,6 @@
                 ;; (generate-pancake-plan)
                 )))
 
-;; This function assigns a unique string to every unique location
-(defun generate-location-string-table (stpr-library)
-  (let ((loc-str-table (make-hash-table))
-         (counter 0)
-        (abc '(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)))
-  (dolist (stpr (stpr-list stpr-library))
-    (dolist (timed-location (st-list stpr))
-      (unless (gethash (location-label timed-location) loc-str-table)
-        (format t "Assigning string ~s to location ~s~%"
-                (string (nth counter abc)) (location-label timed-location))
-        (setf (gethash (location-label timed-location) loc-str-table)
-              (string (nth counter abc)))
-        (setf counter (+ 1 counter)))))
-  (return-from generate-location-string-table loc-str-table)))
-
-
 (defun generate-prepare-drink-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'bottle-place
@@ -251,7 +235,7 @@
 ;; The loc-str-table contains unique string-representations for all locations generated from
 ;; the stpr-library 
 ;; PROBLEMS here are:
-;; - What happens if several storage locations are returner (kitchen has several drawers)?
+;; - What happens if several storage locations are returned (kitchen has several drawers)?
 ;; - How to generate Gaussians for general surfaces?
 ;; returns a labelled gaussian
 (defun get-gaussian (timed-location loc-str-table)
@@ -273,20 +257,6 @@
     (setf (gethash 'bottle-place locations-kb) (list 'bottle-place 0.9 2.991 0.062 0.169))   ;; bottle 
     (setf (gethash 'door locations-kb) (list 'door 3.3 3.3 0.177 0.198))                     ;; door (approximate)
 
-    ;; ;; MORSE simulation
-    ;; (setf (gethash 'drawer locations-kb) (list 'drawer 1.271 2.719 0.077 0.098))             ;; cuttlery
-    ;; (setf (gethash 'table locations-kb) (list 'table 2.0 3.3 0.092 0.169))                   ;; eating place
-    ;; (setf (gethash 'table2 locations-kb) (list 'table2 1.4 1.1 0.169 0.092))                 ;; backpack
-    ;; (setf (gethash 'oven locations-kb) (list 'oven 1.064 2.174 0.062 0.169))                 ;; cornflakes
-    ;; (setf (gethash 'cupboard1 locations-kb) (list 'cupboard1 1.078 3.015 0.078 0.073))       ;; glass
-    ;; (setf (gethash 'cupboard5 locations-kb) (list 'cupboard5 1.342 1.487 0.078 0.073))       ;; 
-    ;; (setf (gethash 'cupboard2 locations-kb) (list 'cupboard2 1.09 2.657 0.078 0.073))        ;;
-    ;; (setf (gethash 'refrigerator locations-kb) (list 'refrigerator 1.2 1.75 0.078 0.073))    ;; milk/quark/butter/cheese
-    ;; (setf (gethash 'cupboard0 locations-kb) (list 'cupboard0 1.18 3.54 0.078 0.073))         ;; plate/bowl
-    ;; (setf (gethash 'sink locations-kb) (list 'sink 1.08 3.11 0.062 0.137))                   ;; sink means the place above the dishwasher where dishes are put when cleaning (not really the sink)
-    ;; (setf (gethash 'bottle-place locations-kb) (list 'bottle-place 1.115 2.791 0.062 0.169)) ;; bottle 
-    ;; (setf (gethash 'door locations-kb) (list 'door 5.3 5.2 0.177 0.198))                     ;; door (approximate)
-    
     ;; currently not used
     (setf (gethash 'cooker locations-kb) (list 'cooker 2.175 1.443 0.092 0.099))
     

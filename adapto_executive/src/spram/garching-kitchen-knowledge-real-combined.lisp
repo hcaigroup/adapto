@@ -12,22 +12,6 @@
                 (generate-clean-table-plan)
                 (generate-prepare-for-work-plan))))
 
-;; This function assigns a unique string to every unique location
-(defun generate-location-string-table (stpr-library)
-  (let ((loc-str-table (make-hash-table))
-         (counter 0)
-        (abc '(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)))
-  (dolist (stpr (stpr-list stpr-library))
-    (dolist (timed-location (st-list stpr))
-      (unless (gethash (location-label timed-location) loc-str-table)
-        (format t "Assigning string ~s to location ~s~%"
-                (string (nth counter abc)) (location-label timed-location))
-        (setf (gethash (location-label timed-location) loc-str-table)
-              (string (nth counter abc)))
-        (setf counter (+ 1 counter)))))
-  (return-from generate-location-string-table loc-str-table)))
-
-
 (defun generate-prepare-drink-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'bottle-place
