@@ -21,8 +21,7 @@
                         (make-instance 'next-location-expectation
                           :next-location-guess (string location)
                           :next-location NIL
-                          :weight probability
-                          :ready-for-validation NIL)))
+                          :weight probability)))
              loc-probs)))
 
 (defun update-next-location (location loc-probs)

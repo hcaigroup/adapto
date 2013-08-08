@@ -3,38 +3,43 @@
 ;; This file defines the classes of expectations that can be used
 
 ;; General expectations: Superclass of all expectations. We might add some common slots there if needed
-(defclass expectation () ())
+(defclass expectation ()
+  ((ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform NIL)))
 
 ;; Expectations about the position of things defined by an area and and a poseStamped
 (defclass position-expectation (expectation)
   ((area :initarg :area :accessor area)
-   (pose :initarg :pose :accessor pose)))
+   (pose :initarg :pose :accessor pose)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
 (defclass next-location-expectation (expectation)
   ((next-location-guess :initarg :next-location-guess :accessor next-location-guess)
    (next-location :initarg :next-location :accessor next-location)
-   (weight :initarg :weight :accessor weight)
-   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation)))
+   (weight :initarg :weight :accessor weight)))
 
 (defclass duration-expectation (expectation)
   ((location-name :initarg :location-name :accessor location-name)
    (max-expected-duration :initarg :max-expected-duration :accessor max-expected-duration)
    (time-entered :initarg :time-entered :accessor time-entered)
-   (time-left :initarg :time-left :accessor time-left)))
+   (time-left :initarg :time-left :accessor time-left)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
 (defclass object-expectation (expectation)
   ((object :initarg :object :accessor object)
-   (flexible :initarg :flexible :accessor flexible)))
+   (flexible :initarg :flexible :accessor flexible)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
 (defclass action-expectation (expectation)
   ((action-type :initarg :action-type :accessor action-type)
    (duration :initarg :duration :accessor duration)
-   (start-time :initarg :start-time :accessor start-time)))
+   (start-time :initarg :start-time :accessor start-time)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
 (defclass navigation-action-expectation (action-expectation)
   ((action-type :initarg :action-type :accessor action-type :initform 'navigation )
    (path-length :initarg :path-length :accessor path-length)
-   (avg-speed :initarg :avg-speed :accessor :avg-speed)))
+   (avg-speed :initarg :avg-speed :accessor :avg-speed)
+   (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
 ;; Validation methods of expectations MUST always return number between 0 or 1. 
 
