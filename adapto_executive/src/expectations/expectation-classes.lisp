@@ -6,6 +6,10 @@
 (defclass expectation ()
   ((ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform NIL)))
 
+;; Like in composite pattern, an expectation can also consist of several sub-expectations
+(defclass expectations-category (expectation)
+  ((expectations-list :initarg :expectations-list :accessor expectations-list)))
+
 ;; Expectations about the position of things defined by an area and and a poseStamped
 (defclass position-expectation (expectation)
   ((area :initarg :area :accessor area)
@@ -47,6 +51,14 @@
 
 (defmethod validate-expectation (x)
   (error "[expectation-classes.lisp] - No validation-function defined for this type"))
+
+(defmethod validate-expectation ((exp expectations-category))
+  "Iterate through expectations list and return average of each validated expectation"
+  (let ((normality-list NIL))
+    (setf normality-list
+          (loop for e in (expectations-list exp)
+             collect (validate-expectation exp)))
+    (average normality-list)))
 
 (defmethod validate-expectation ((exp position-expectation))
   "Returns 1 if POSE of POSITION-EXPECTATION is inside AREA, else returns 0"
