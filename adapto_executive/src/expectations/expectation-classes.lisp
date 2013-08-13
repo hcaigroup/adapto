@@ -76,7 +76,8 @@
    of EXP if locations match, 0 otherwise"
   (if (eq (ready-for-validation exp) NIL)
     NIL
-    (gethash (next-location exp) (next-location-probdist exp))))
+    (progn
+      (gethash (string (next-location exp)) (next-location-probdist exp)))))
 
 (defmethod validate-expectation ((exp duration-expectation))
   "Return 1 if current time - start-time does not exceed max-expected duration,

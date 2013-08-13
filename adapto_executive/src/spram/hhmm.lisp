@@ -153,7 +153,7 @@
 (defun normalize-belief (belief)
   "Normalizes the posterior probabilities of an hmm after the measurement update according to
    Thrun et al. (Probabilistic Robotics book)"
-  (let ((normalizer 0) (new-belief (make-hash-table)))
+  (let ((normalizer 0) (new-belief (make-hash-table :test 'equal)))
     (maphash #'(lambda (state probability)
                  (declare (ignore state))
                  (setf normalizer (+ normalizer probability))) belief)

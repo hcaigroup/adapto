@@ -16,27 +16,24 @@
   "This funtion creates and updates expectations about the next estimated location of the human
    according to the probability histogram LOC-PROBS"
   (let ((*package* (find-package :ad-exe)))
-    (maphash #'(lambda (location probability)
-                 (addgv :human-activity-expectations (intern (concatenate 'string location "-future"))
-                        (make-instance 'next-location-expectation
-                          :next-location-guess (string location)
-                          :next-location NIL
-                          :weight probability)))
-             loc-probs)))
+    (addgv :human-activity-expectations "future-location"
+           (make-instance 'next-location-expectation
+             :next-location-probdist loc-probs
+             :next-location NIL))
+    loc-probs))
 
 (defun update-next-location (location loc-probs)
   "This function updates all currently active location expectations with the current location
    detection."
   (let ((*package* (find-package :ad-exe)))
-    (maphash #'(lambda (loc prob)
-                 (declare (ignore prob))
-                 (addgv :human-activity-expectations (intern loc)
-                        (make-instance 'next-location-expectation
-                          :next-location-guess (next-location-guess (getgv :human-activity-expectations (intern (concatenate 'string loc "-future"))))
-                          :next-location location
-                          :weight (weight (getgv :human-activity-expectations (intern (concatenate 'string loc "-future"))))
-                          :ready-for-validation T)))
-             loc-probs)))
+    (addgv :human-activity-expectations (intern "past-location")
+           (make-instance 'next-location-expectation
+             :next-location-probdist(next-location-probdist
+                                     (getgv :human-activity-expectations
+                                            "future-location"))
+             :next-location location
+             :ready-for-validation T))
+    loc-probs))
 
 (defun generate-location-expectations ()
   "Here we define the instances of our expectations and put them into a global structure
