@@ -10,16 +10,19 @@
 (defclass expectations-category (expectation)
   ((expectations-list :initarg :expectations-list :accessor expectations-list)))
 
+;; Probabilistic expectations have a discrete probability distribution PROBDIST 
+(defclass probabilistic-expectation (expectation)
+  ((probdist :initarg :probdist :accessor probdist)))
+
 ;; Expectations about the position of things defined by an area and and a poseStamped
 (defclass position-expectation (expectation)
   ((area :initarg :area :accessor area)
    (pose :initarg :pose :accessor pose)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
-(defclass next-location-expectation (expectation)
-  ((next-location-guess :initarg :next-location-guess :accessor next-location-guess)
-   (next-location :initarg :next-location :accessor next-location)
-   (weight :initarg :weight :accessor weight)))
+(defclass next-location-expectation (probabilistic-expectation)
+  ((next-location-probdist :initarg :next-location-probdist :accessor next-location-probdist)
+   (next-location :initarg :next-location :accessor next-location)))
 
 (defclass duration-expectation (expectation)
   ((location-name :initarg :location-name :accessor location-name)
@@ -52,6 +55,8 @@
 (defmethod validate-expectation (x)
   (error "[expectation-classes.lisp] - No validation-function defined for this type"))
 
+;; By default, we use average of normalities, but this is problematic when using probabilistic
+;; expectations as we do for the next-location-expectations
 (defmethod validate-expectation ((exp expectations-category))
   "Iterate through expectations list and return average of each validated expectation"
   (let ((normality-list NIL))
@@ -69,10 +74,9 @@
 (defmethod validate-expectation ((exp next-location-expectation))
   "If EXP not ready to validate, returns NIL. If EXP is ready to validaterReturns weight
    of EXP if locations match, 0 otherwise"
-  (unless (eq (ready-for-validation exp) NIL)
-    (if (string= (next-location-guess exp) (next-location exp))
-      (weight exp)
-      0)))
+  (if (eq (ready-for-validation exp) NIL)
+    NIL
+    (gethash (next-location exp) (next-location-probdist exp))))
 
 (defmethod validate-expectation ((exp duration-expectation))
   "Return 1 if current time - start-time does not exceed max-expected duration,
