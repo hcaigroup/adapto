@@ -121,19 +121,8 @@
            :flexible NIL)))
 
 (defun clean-expectations ()
-  (clear-global-structure :robot-navigation-expectations)
-  (clear-global-structure :world-physical-expectations)
-  (clear-global-structure :object-physcial-expectations)
-  (clear-global-structure :human-duration-expectations)
-  (clear-global-structure :human-activity-expectations)
-  )
+  (clear-global-structure :expectations))
 
 ;; This function defines the structure of our expectations-network
 (defun init-expectations ()
-  (create-global-structure :expectations)
-  ;; Following will be deprecated as soon as tree implementation works!!!
-  (create-global-structure :robot-navigation-expectations)
-  (create-global-structure :world-physical-expectations)
-  (create-global-structure :object-physical-expectations)
-  (create-global-structure :human-duration-expectations)
-  (create-global-structure :human-activity-expectations))
+  (create-global-structure :expectations))
