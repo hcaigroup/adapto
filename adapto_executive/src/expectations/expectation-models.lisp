@@ -16,18 +16,21 @@
     :next-location-probdist loc-probs
     :next-location NIL))
 
-(defun update-next-location (location loc-probs)
-  "This function updates all currently active location expectations with the current location
-   detection."
-  (let ((*package* (find-package :ad-exe)))
-    (addgv :human-activity-expectations (intern "past-location")
-           (make-instance 'next-location-expectation
-             :next-location-probdist(next-location-probdist
-                                     (getgv :human-activity-expectations
-                                            "future-location"))
-             :next-location location
-             :ready-for-validation T))
-    loc-probs))
+(defun update-next-location (location last-merged-loc-probs)
+  "This function updates all currently active next-location expectations with the current location
+   detection. Returns expectations category"
+  (let ((*package* (find-package :ad-exe)) (expectations-list ()))
+    (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
+      (when (string= (string (type-of e)) "NEXT-LOCATION-EXPECTATION")
+        (setf expectations-list
+              (cons (make-instance 'next-location-expectation
+                      :next-location-probdist last-merged-loc-probs
+                      :next-location location
+                      :ready-for-validation T)
+                    expectations-list)))
+        (setf expectations-list (cons e expectations-list)))
+    (make-instance 'expectations-category
+      :expectations-list expectations-list)))
 
 (defun generate-location-expectations ()
   "Here we define the instances of our expectations and put them into a global structure

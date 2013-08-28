@@ -13,7 +13,7 @@
       (walking-dir-publisher NIL)
       (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
-      (max-loc-duration-table NIL)
+      (max-loc-duration-table NIL) (last-merged-loc-probs NIL)
       (current-location-observation NIL))
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
@@ -227,9 +227,9 @@
                                        location-observation
                                        last-semantic-location-observation)
                                 (progn
+                                  (unless (eq merged-loc-probs NIL)
+                                    (setf last-merged-loc-probs (normalize-belief merged-loc-probs)))
                                   (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
-                                  ;; (unless (eq start-flag NIL)
-                                  ;;   (update-next-location location-observation (normalize-belief merged-loc-probs)))
                                   (addgv :expectations 'human-expectations
                                          (make-instance 'expectations-category
                                            :expectations-list (list
@@ -237,13 +237,10 @@
                                                                 current-location-observation
                                                                 (gethash (string current-location-observation)
                                                                          max-loc-duration-table))
-                                                               (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs))
-                                                              )))
-                                                                    ;; (generate-duration-exp
-                                  ;;  current-location-observation
-                                  ;;  (gethash (string current-location-observation) max-loc-duration-table))
-                                  ;; (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs))
-                                  
+                                                               (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs)))))
+                                  (unless (eq start-flag NIL)
+                                    (setgv :expectations 'human-expectations
+                                           (update-next-location location-observation last-merged-loc-probs)))
                                   (format t "I guess human will stay maximally ~s s at ~s~%"
                                           (gethash (string current-location-observation) max-loc-duration-table)
                                           current-location-observation))
