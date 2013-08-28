@@ -228,15 +228,25 @@
                                        last-semantic-location-observation)
                                 (progn
                                   (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
-                                  (unless (eq start-flag NIL)
-                                    (update-next-location location-observation (normalize-belief merged-loc-probs)))
-                                  (generate-duration-exp
-                                   current-location-observation
-                                   (gethash (string current-location-observation) max-loc-duration-table))
+                                  ;; (unless (eq start-flag NIL)
+                                  ;;   (update-next-location location-observation (normalize-belief merged-loc-probs)))
+                                  (addgv :expectations 'human-expectations
+                                         (make-instance 'expectations-category
+                                           :expectations-list (list
+                                                               (generate-duration-exp
+                                                                current-location-observation
+                                                                (gethash (string current-location-observation)
+                                                                         max-loc-duration-table))
+                                                               (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs))
+                                                              )))
+                                                                    ;; (generate-duration-exp
+                                  ;;  current-location-observation
+                                  ;;  (gethash (string current-location-observation) max-loc-duration-table))
+                                  ;; (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs))
+                                  
                                   (format t "I guess human will stay maximally ~s s at ~s~%"
                                           (gethash (string current-location-observation) max-loc-duration-table)
-                                          current-location-observation)
-                                  (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs)))
+                                          current-location-observation))
                                 (setf start-flag 1))
                               ;; Reset object cache when observations was added
                               (setf objects-cache NIL)))

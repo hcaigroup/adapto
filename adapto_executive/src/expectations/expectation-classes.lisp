@@ -50,7 +50,7 @@
 
 ;; Validation methods of expectations MUST always return number between 0 or 1. 
 
-(defgeneric validate-expectation (x))
+1(defgeneric validate-expectation (x))
 
 (defmethod validate-expectation (x)
   (error "[expectation-classes.lisp] - No validation-function defined for this type"))
@@ -60,10 +60,9 @@
 (defmethod validate-expectation ((exp expectations-category))
   "Iterate through expectations list and return average of each validated expectation"
   (let ((normality-list NIL))
-    (setf normality-list
-          (loop for e in (expectations-list exp)
-             collect (validate-expectation exp)))
-    (average normality-list)))
+    (dolist (e (expectations-list exp))
+      (setf normality-list (cons (validate-expectation e) normality-list)))
+    normality-list))
 
 (defmethod validate-expectation ((exp position-expectation))
   "Returns 1 if POSE of POSITION-EXPECTATION is inside AREA, else returns 0"

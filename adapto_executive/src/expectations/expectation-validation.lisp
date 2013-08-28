@@ -21,26 +21,9 @@
 
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
-  (let  ((robot-navigation-normalities (map-global-structure 'validate-expectation :robot-navigation-expectations))
-         (world-physical-normalities (map-global-structure 'validate-expectation :world-physical-expectations))
-         (object-physical-normalities (map-global-structure 'validate-expectation :object-physical-expectations))
-         (human-duration-normalities (map-global-structure 'validate-expectation :human-duration-expectations))
-         (human-activity-normalities (map-global-structure 'validate-expectation :human-activity-expectations))
-         (normalities NIL))
-
-    (setf normalities (cons
-                       (average robot-navigation-normalities)
-                       (cons (average world-physical-normalities)
-                             (cons (average object-physical-normalities)
-                                   (cons (average human-duration-normalities)
-                                         (list (sum (get-rid-of-nils human-activity-normalities))))))))
-    (format t "Normalities:~%")
-    (format t "Robot navigation: ~s~%" (average robot-navigation-normalities))
-    (format t "World physical: ~s~%" (average world-physical-normalities))
-    (format t "Object physical: ~s~%" (average object-physical-normalities))
-    (format t "Human durations: ~s~%" (average human-duration-normalities))
-    (format t "Human activity: ~s~%" (sum (get-rid-of-NILs human-activity-normalities)))
-    (format t "~% General Normality: ~s~%" (average (get-rid-of-nils normalities)))
+  (let ((normalities (map-global-structure 'validate-expectation :expectations)))
+    (format t "Normalities: ~s ~%" normalities)
+    ;; (format t "Overall normality: ~s~%" (average (get-rid-of-NILS normalities)))
     ))
 
 

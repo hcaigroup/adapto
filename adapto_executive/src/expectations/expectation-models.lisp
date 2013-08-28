@@ -4,23 +4,17 @@
   "This function generates a duration prob for the location LOCATION-NAME with
    MAX-EXPECTED-DURATION. Only one duration expectation is allowed, so global
    structure gets cleared before new durations are added."
-  (let ((*package* (find-package :ad-exe)))
-    (clear-global-structure :human-duration-expectations)
-    (addgv :human-duration-expectations (intern location-name)
-           (make-instance 'duration-expectation
-             :location-name (string location-name)
-             :max-expected-duration max-expected-duration
-             :time-entered (get-universal-time)))))
+   (make-instance 'duration-expectation
+     :location-name (string location-name)
+     :max-expected-duration max-expected-duration
+     :time-entered (get-universal-time)))
 
 (defun generate-loc-exps-from-prob-dist (loc-probs)
   "This funtion creates and updates expectations about the next estimated location of the human
    according to the probability histogram LOC-PROBS"
-  (let ((*package* (find-package :ad-exe)))
-    (addgv :human-activity-expectations "future-location"
-           (make-instance 'next-location-expectation
-             :next-location-probdist loc-probs
-             :next-location NIL))
-    loc-probs))
+  (make-instance 'next-location-expectation
+    :next-location-probdist loc-probs
+    :next-location NIL))
 
 (defun update-next-location (location loc-probs)
   "This function updates all currently active location expectations with the current location
@@ -133,6 +127,8 @@
 
 ;; This function defines the structure of our expectations-network
 (defun init-expectations ()
+  (create-global-structure :expectations)
+  ;; Following will be deprecated as soon as tree implementation works!!!
   (create-global-structure :robot-navigation-expectations)
   (create-global-structure :world-physical-expectations)
   (create-global-structure :object-physical-expectations)
