@@ -27,7 +27,8 @@
   <!--depend package="morse_jido_pm"/-->
   <depend package="arm_navigation_msgs"/>
   <depend package="kdl_arm_kinematics"/>  
-
+  <depend package="pr2_controllers_msgs"/>
+  <depend package="trajectory_msgs"/>
 </package>
 
 

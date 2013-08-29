@@ -14,6 +14,8 @@
                move_base_msgs-msg
                nav_msgs-msg
                arm_navigation_msgs-msg
+               pr2_controllers_msgs-msg
+               trajectory_msgs-msg
                roll)
   :components
   ( (:file "package")
