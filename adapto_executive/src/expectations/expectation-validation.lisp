@@ -22,7 +22,8 @@
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
   (let ((normalities (map-global-structure 'validate-expectation :expectations)))
-    (format t "Normalities: ~s ~%" normalities)))
+    (format t "Normalities: ~s~%" normalities)
+    normalities))
 
 
 

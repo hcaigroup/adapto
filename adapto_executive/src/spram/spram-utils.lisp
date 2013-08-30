@@ -421,6 +421,18 @@ is replaced with replacement."
              good-plan-observations)
     (format file "0~%")))
 
+(defun write-normality-tree-to-csv (normality-tree filename)
+  "Writes the NORMALITY-TREE to the csv-file FILENAME.
+   NOTE: This funtion is a dirt hack made due to lack of time
+   => REWRITE IT TO GET MORE GENERAL"
+  (with-open-file (file filename
+                        :direction :output
+                        :if-exists :append
+                        :if-does-not-exist :create)
+    (format file "~s," (roslisp:ros-time))
+    (dolist (normality normality-tree)
+      (format file "~s, ~s~%" (average (get-rid-of-NILs normality)) normality))))
+
 (defun distance (pose-data last-pose-data)
   "Calculates 2d-distance between the two nav_msgs/Odometry POSE-DATA
    and the geometry_msgs/Point LAST-POSE-DATA
