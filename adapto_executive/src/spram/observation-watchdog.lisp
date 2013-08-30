@@ -117,12 +117,11 @@
            (setf plan-probs (calculate-plan-probabilities (belief hmm)))
            (unless (eq plan-probs NIL) (visualize-plan-probs plan-probs))
            (format t "~s~%" (validate-expectations))
-           ;; (unless (eq plan-probs NIL)
-           ;;   (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv"))
-           ;; (unless (eq merged-belief NIL)
-           ;;   (write-loc-probs-to-csv
-           ;;    merged-belief "~/Desktop/loc-probs.csv"))
-           )
+           (unless (eq plan-probs NIL)
+             (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv"))
+           (unless (eq merged-belief NIL)
+             (write-loc-probs-to-csv
+              merged-belief "~/Desktop/loc-probs.csv")))
         
         ;; Check if human has moved every movement-time seconds
         (when (> deltaT (human-movement-time params))
@@ -183,11 +182,11 @@
                               ;; (setf merged-plan-probs (weight-beliefs plan-probs plan-object-hits))
                               
                               (visualize-plan-probs plan-probs)
-                              ;; (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv")
+                              (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv")
                               
                               ;; TODOTODOTODO: Get monitoring together in own functions!!!!
-                              ;; (write-loc-probs-to-csv
-                              ;;  (normalize-belief (forward-step-belief hmm)) "/home/kargm/Desktop/loc-probs.csv")
+                              (write-loc-probs-to-csv
+                               (normalize-belief (forward-step-belief hmm)) "/home/kargm/Desktop/loc-probs.csv")
                               (setf last-orientation (return-orientation-yaw data))
                               (setf last-walking-direction walking-direction)
                               (setf good-plan-observations (get-good-observations
@@ -198,7 +197,7 @@
                                                             last-motion-data
                                                             loc-str-table
                                                             plan-library))
-                              ;; (write-good-plan-obs-to-csv good-plan-observations "~/Desktop/good-plan-obs.csv")
+                              (write-good-plan-obs-to-csv good-plan-observations "~/Desktop/good-plan-obs.csv")
                               (setf monitoring-belief
                                     (predict-locations
                                      good-plan-observations
@@ -214,14 +213,14 @@
                               ;; NOTE: HERE merged-belief is ONLY USED FOR LOCATION-PREDICTION!!!! Could later be used
                               ;; to IMPROVE BELIEF OF HMM!?
 
-                              ;; (unless (eq merged-belief NIL)
-                              ;;   (write-loc-probs-to-csv
-                              ;;    merged-belief "~/Desktop/loc-probs.csv"))
+                              (unless (eq merged-belief NIL)
+                                (write-loc-probs-to-csv
+                                 merged-belief "~/Desktop/loc-probs.csv"))
                               (setf merged-belief
                                     (normalize-belief
                                      (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
-                              ;; (write-loc-probs-to-csv
-                              ;;  merged-belief "~/Desktop/loc-probs.csv")
+                              (write-loc-probs-to-csv
+                               merged-belief "~/Desktop/loc-probs.csv")
 
                               (unless (string=
                                        location-observation
