@@ -35,7 +35,7 @@
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 50
+                                        :duration 20
                                         :object-labels '(glass bottle)))
                  :plan-length 4
                  :name 'prepare-drink-plan
@@ -73,7 +73,7 @@
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 120
+                                        :duration 50
                                         :object-labels '(cornflakes milk spoon bowl)))
                  :plan-length 8 
                  :name 'prepare-cornflakes-plan
@@ -111,7 +111,7 @@
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 120
+                                        :duration 50
                                         :object-labels '(quark milk spoon bowl)))
                  :plan-length 8 
                  :name 'prepare-quark-plan
