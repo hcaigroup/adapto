@@ -182,7 +182,6 @@
    of locations from our knowledge-base, LAST-STOP-TIME and ROS-TIME are used to calculate durations."
   (let ((new-belief (make-hash-table)))
     ;; Append observation to end of list
-    
     (unless (string= location-observation (last-observation hmm))
       (setf (observations hmm) (reverse (cons location-observation (reverse (observations hmm))))))
     ;; (format t "~% >>> Saw human standing for ~3$ s at ~s with object ~s)~%"
@@ -194,13 +193,14 @@
             (if (string= location-observation (last-observation hmm))
               (setf new-belief (belief hmm))
               (progn
-                (format t "~% >>> Saw human standing for ~3$ s at ~s with object ~s)~%"
+                (format t "~% >>> New observation: [duration: ~3$ s, loc: ~s,  objects: ~s]~%"
                         duration location-observation objects-cache)
                 (setf new-belief ;; (normalize-belief
                       ;;  (bayes-filter hmm location-observation))
                       (normalize-belief
                        (forward-backward hmm)))))))
-      (setf (last-observation hmm) location-observation)
+      (unless (string= location-observation (last-observation hmm))
+        (setf (last-observation hmm) location-observation))
       (setf (belief hmm) new-belief))
     new-belief))
 
