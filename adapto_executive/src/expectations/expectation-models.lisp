@@ -16,19 +16,57 @@
     :next-location-probdist loc-probs
     :next-location NIL))
 
-(defun update-next-location (location last-merged-loc-probs)
+(defun create-or-update-duration-expectation (location-name max-expected-duration)
+  "This function updates the duration expectation with new values or creates a new one of no
+   duration expectation does exist. Returns expectations category."
+  (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
+    (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
+      (if (string= (string (type-of e)) "DURATION-EXPECTATION")
+        (progn (setf expectations-list
+                     (cons (make-instance 'duration-expectation
+                             :location-name (string location-name)
+                             :max-expected-duration max-expected-duration
+                             :time-entered (get-universal-time))
+                           expectations-list))
+               (setf found-exp T))
+        (setf expectations-list (cons e expectations-list))))
+    (when (eq found-exp NIL)
+      (setf expectations-list (cons (make-instance 'duration-expectation
+                                     :location-name (string location-name)
+                                     :max-expected-duration max-expected-duration
+                                     :time-entered (get-universal-time))
+                                   expectations-list)))
+    (make-instance 'expectations-category
+      :expectations-list expectations-list)))
+
+(defun create-or-update-loc-exps-from-prob-dist (loc-probs location-observation last-merged-loc-probs)
   "This function updates all currently active next-location expectations with the current location
    detection. Returns expectations category"
-  (let ((*package* (find-package :ad-exe)) (expectations-list ()))
+  (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
     (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
-      (when (string= (string (type-of e)) "NEXT-LOCATION-EXPECTATION")
-        (setf expectations-list
-              (cons (make-instance 'next-location-expectation
-                      :next-location-probdist last-merged-loc-probs
-                      :next-location location
-                      :ready-for-validation T)
-                    expectations-list)))
-        (setf expectations-list (cons e expectations-list)))
+      (if (string= (string (type-of e)) "NEXT-LOCATION-EXPECTATION")
+        (progn
+          (when (eq (ready-for-validation e) NIL)
+            (setf expectations-list
+                  (cons (make-instance 'next-location-expectation
+                          :next-location-probdist loc-probs
+                          :next-location NIL
+                          :ready-for-validation NIL)
+                        expectations-list))
+            (unless (eq last-merged-loc-probs NIL)
+              (setf expectations-list
+                    (cons (make-instance 'next-location-expectation
+                            :next-location-probdist last-merged-loc-probs
+                            :next-location location-observation
+                            :ready-for-validation T)
+                          expectations-list)))
+            (setf found-exp T)))
+        (setf expectations-list (cons e expectations-list))))
+    (when (eq found-exp NIL)
+      (setf expectations-list (cons (make-instance 'next-location-expectation
+                                      :next-location-probdist loc-probs
+                                      :next-location NIL)
+                                    expectations-list)))
     (make-instance 'expectations-category
       :expectations-list expectations-list)))
 

@@ -14,8 +14,7 @@
       (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
       (max-loc-duration-table NIL) (last-merged-loc-probs NIL)
-      (current-location-observation NIL)
-      (duration-exp NIL))
+      (current-location-observation NIL))
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
     "Initialize SPRAM module by generating a spatial model, unique string labels and init the hmm"
@@ -38,7 +37,10 @@
     (setf (observation-probabilities hmm) (create-state-observation-probabilities))
 
     (format t "~%~% --------------------------- HMM INIT DONE --------------------------------~%")
-
+    (format t "~%~% ------------------------- Init Expectations ------------------------------~%")
+    (addgv :expectations 'human-expectations (make-instance 'expectations-category
+                                               :expectations-list ()))
+    (format t "~%~% -----------------------Init Expectations DONE------------------------------~%")
     (setf good-plan-observations (init-plan-good-observations-table plan-library))
     (let ((params (get-real-params))
           ;; (params (get-morse-params))
@@ -144,14 +146,10 @@
                        (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
                   (setf current-location-observation
                         (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
-                  (setf duration-exp (generate-duration-exp
-                                      current-location-observation
-                                      (gethash (string current-location-observation)
-                                               max-loc-duration-table)))
-                  (unless (eq current-location-observation NIL)
-                    (addgv :expectations 'human-expectations
-                           (make-instance 'expectations-category
-                             :expectations-list (list duration-exp))))
+                  (addgv :expectations 'human-expectations
+                         (create-or-update-duration-expectation current-location-observation
+                                                      (gethash (string current-location-observation)
+                                                               max-loc-duration-table)))
                   (format t "I guess human will stay maximally ~s s at ~s~%"
                           (gethash (string current-location-observation) max-loc-duration-table)
                           current-location-observation)))
@@ -251,14 +249,8 @@
                                     (setf last-merged-loc-probs (normalize-belief merged-loc-probs)))
                                   (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
                                   (addgv :expectations 'human-expectations
-                                         (make-instance 'expectations-category
-                                           :expectations-list (list
-                                                               (generate-loc-exps-from-prob-dist (normalize-belief merged-loc-probs))
-                                                               duration-exp)))
-                                  (unless (eq start-flag NIL)
-                                    (setgv :expectations 'human-expectations
-                                           (update-next-location location-observation last-merged-loc-probs)))
-                              )
+                                         (create-or-update-loc-exps-from-prob-dist
+                                          (normalize-belief merged-loc-probs) location-observation last-merged-loc-probs)))
                                 (setf start-flag 1))
                               ;; Reset object cache when observations was added
                               (setf objects-cache NIL)))
