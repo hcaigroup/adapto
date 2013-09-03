@@ -29,6 +29,7 @@
     (setf (belief hmm) (create-uniform-state-probabilities-from-stpr-library plan-library))
     (setf (start-belief hmm) (create-uniform-state-probabilities-from-stpr-library plan-library))
     (setf (state-transitions hmm) (create-state-transition-probabilities))
+    (setf (observations hmm) ())
 
     ;; NOTE!!! Here we have to decide if we want to use the estimated emission probabilities
     ;; or the ones calculated with ML
@@ -169,7 +170,8 @@
                     (if (> loc-obs-dist 0.4)
                           (if (> (+ last-duration duration) 0.2)
                             (progn
-                              (setf last-semantic-location-observation location-observation)
+                              (unless (string= location-observation (last-observation hmm))
+                                (setf last-semantic-location-observation location-observation))
                               (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
                               (add-observation-to-hmm
                                location-observation
