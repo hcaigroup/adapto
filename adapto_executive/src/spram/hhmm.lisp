@@ -182,8 +182,9 @@
    of locations from our knowledge-base, LAST-STOP-TIME and ROS-TIME are used to calculate durations."
   (let ((new-belief (make-hash-table)))
     ;; Append observation to end of list
-    (setf (observations hmm) (reverse (cons location-observation (reverse (observations hmm)))))
     
+    (unless (string= location-observation (last-observation hmm))
+      (setf (observations hmm) (reverse (cons location-observation (reverse (observations hmm))))))
     ;; (format t "~% >>> Saw human standing for ~3$ s at ~s with object ~s)~%"
     ;;         duration location-observation objects-cache)
     ;; Here I apply a filtering for same locations that are not supposed to appear several
