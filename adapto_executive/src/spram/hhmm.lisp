@@ -193,7 +193,7 @@
             (if (string= location-observation (last-observation hmm))
               (setf new-belief (belief hmm))
               (progn
-                (format t "~% >>> New observation: [duration: ~3$ s, loc: ~s,  objects: ~s]~%"
+                (format t "~%New observation: [duration: ~3$ s, loc: ~s,  objects: ~s]~%~%"
                         duration location-observation objects-cache)
                 (setf new-belief ;; (normalize-belief
                       ;;  (bayes-filter hmm location-observation))
