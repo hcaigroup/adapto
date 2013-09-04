@@ -23,15 +23,15 @@
 (defun generate-prepare-drink-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'bottle-place
-                                        :duration 1
+                                        :duration 2.61
                                         :object-labels '(bottle))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(bottle))
                                       (make-instance 'timed-location
                                         :location-label 'cupboard1 
-                                        :duration 4
+                                        :duration 6.35
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'table
@@ -39,181 +39,173 @@
                                         :object-labels '(glass bottle)))
                  :plan-length 4
                  :name 'prepare-drink-plan
-                 :duration 60
+                 :duration 33.81
                  :short-name 'DW))
 
 (defun generate-prepare-cornflakes-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'oven
-                                        :duration 1.5
+                                        :duration 2.61
                                         :object-labels '(cornflakes))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 3
+                                        :duration 4.85
                                         :object-labels '(cornflakes))
                                       (make-instance 'timed-location
                                         :location-label 'refrigerator 
-                                        :duration 4
+                                        :duration 6.35
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
                                         :location-label 'cupboard0
-                                        :duration 3
+                                        :duration 6.35
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 3
+                                        :duration 4.85
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'drawer
-                                        :duration 2
+                                        :duration 5.58
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 50
+                                        :duration 35
                                         :object-labels '(cornflakes milk spoon bowl)))
                  :plan-length 8 
                  :name 'prepare-cornflakes-plan
-                 :duration 150
+                 :duration 70.44
                  :short-name 'STC))
 
 (defun generate-prepare-quark-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'refrigerator
-                                        :duration 3.5
+                                        :duration 6.35
                                         :object-labels '(quark))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(quark))
                                       (make-instance 'timed-location
                                         :location-label 'refrigerator 
-                                        :duration 4
+                                        :duration 6.35
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
                                         :location-label 'cupboard0
-                                        :duration 3
+                                        :duration 6.35
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 3
+                                        :duration 4.85
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'drawer
-                                        :duration 2
+                                        :duration 6.46
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 50
+                                        :duration 35
                                         :object-labels '(quark milk spoon bowl)))
                  :plan-length 8 
                  :name 'prepare-quark-plan
-                 :duration 150
+                 :duration 70.44
                  :short-name 'STQ))
 
 (defun generate-clean-table-cornflakes-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
-                                        :location-label 'table
-                                        :duration 3
-                                        :object-labels '(cornflakes))
-                                      (make-instance 'timed-location
                                         :location-label 'oven
-                                        :duration 2
+                                        :duration 2.61
                                         :object-labels '(cornflakes))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 3
-                                        :object-labels '(milk))
-                                      (make-instance 'timed-location
-                                        :location-label 'refrigerator
                                         :duration 4.85
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
+                                        :location-label 'refrigerator
+                                        :duration 6.35
+                                        :object-labels '(milk))
+                                      (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(spoon)))
-                 :plan-length 10
+                 :plan-length 9
                  :name 'clean-table-cornflakes-plan
-                 :duration 28
+                 :duration 36.19
                  :short-name 'CTC))
 
 (defun generate-clean-table-quark-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
-                                        :location-label 'table
-                                        :duration 3
-                                        :object-labels '(quark))
-                                      (make-instance 'timed-location
                                         :location-label 'refrigerator
-                                        :duration 2
+                                        :duration 6.35
                                         :object-labels '(quark))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 3
-                                        :object-labels '(milk))
-                                      (make-instance 'timed-location
-                                        :location-label 'refrigerator
                                         :duration 4.85
                                         :object-labels '(milk))
                                       (make-instance 'timed-location
+                                        :location-label 'refrigerator
+                                        :duration 6.35
+                                        :object-labels '(milk))
+                                      (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(bowl))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(glass))
                                       (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(spoon))
                                       (make-instance 'timed-location
                                         :location-label 'sink
-                                        :duration 3
+                                        :duration 2.61
                                         :object-labels '(spoon)))
-                 :plan-length 10
+                 :plan-length 9
                  :name 'clean-table-quark-plan
-                 :duration 28
+                 :duration 44.78
                  :short-name 'CTQ))
 
 (defun generate-prepare-for-work-plan ()
   (make-instance 'stpr :st-list (list (make-instance 'timed-location
                                         :location-label 'table
-                                        :duration 2
+                                        :duration 4.85
                                         :object-labels '(bottle))
                                       (make-instance 'timed-location
                                         :location-label 'table2
@@ -221,11 +213,11 @@
                                         :object-labels '(bottle backpack bagpack suitcase))
                                       (make-instance 'timed-location
                                         :location-label 'door 
-                                        :duration 4
+                                        :duration 6
                                         :object-labels '(backpack bagpack suitcase)))
                  :plan-length 3
                  :name 'prepare-for-work-plan
-                 :duration 18
+                 :duration 18.85
                  :short-name 'PW))
 
 ;; This is the *MAGIC* function that translates the labels of the timed locations into the
