@@ -22,20 +22,22 @@
   (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
     (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
       (if (string= (string (type-of e)) "DURATION-EXPECTATION")
-        (progn (setf expectations-list
-                     (cons (make-instance 'duration-expectation
-                             :location-name (string location-name)
-                             :max-expected-duration max-expected-duration
-                             :time-entered (get-universal-time))
-                           expectations-list))
-               (setf found-exp T))
+        (progn
+          (setf expectations-list
+                (cons (make-instance 'duration-expectation
+                        :location-name (string location-name)
+                        :max-expected-duration max-expected-duration
+                        :time-entered (get-universal-time))
+                      expectations-list))
+          (setf found-exp T))
         (setf expectations-list (cons e expectations-list))))
     (when (eq found-exp NIL)
-      (setf expectations-list (cons (make-instance 'duration-expectation
-                                     :location-name (string location-name)
-                                     :max-expected-duration max-expected-duration
-                                     :time-entered (get-universal-time))
-                                   expectations-list)))
+      (progn
+        (setf expectations-list (cons (make-instance 'duration-expectation
+                                        :location-name (string location-name)
+                                        :max-expected-duration max-expected-duration
+                                        :time-entered (get-universal-time))
+                                      expectations-list))))
     (make-instance 'expectations-category
       :expectations-list expectations-list)))
 

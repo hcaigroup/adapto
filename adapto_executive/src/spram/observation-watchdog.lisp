@@ -151,7 +151,7 @@
                          (create-or-update-duration-expectation current-location-observation
                                                       (gethash (string current-location-observation)
                                                                max-loc-duration-table)))
-                  (format t "~%--- I guess human will stay maximally ~s s at ~s ---~%"
+                  (format t "~%--- I guess human will stay maximally ~s s at ~s ---~%~%"
                           (gethash (string current-location-observation) max-loc-duration-table)
                           current-location-observation)))
               
@@ -194,12 +194,11 @@
                                objects-cache
                                duration
                                hmm)
-                            
+                              ;; Create expectations every time, HMM is updated
                               (unless (string= location-observation last-semantic-location-observation)
-                                (format t "Add exp")
                                 (addgv :expectations 'human-expectations
                                        (create-or-update-loc-exps-from-prob-dist
-                                        (normalize-belief (forward-step-belief  hmm)) location-observation)))
+                                        (merge-loc-probs (normalize-belief (forward-step-belief  hmm))) location-observation)))
                               
                               (setf last-duration 0)
                               (setf plan-probs (calculate-plan-probabilities (belief hmm)))
