@@ -39,7 +39,7 @@
     (make-instance 'expectations-category
       :expectations-list expectations-list)))
 
-(defun create-or-update-loc-exps-from-prob-dist (loc-probs location-observation last-merged-loc-probs)
+(defun create-or-update-loc-exps-from-prob-dist (loc-probs location-observation)
   "This function updates all currently active next-location expectations with the current location
    detection. Returns expectations category"
   (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
@@ -53,13 +53,12 @@
                           :next-location NIL
                           :ready-for-validation NIL)
                         expectations-list))
-            (unless (eq last-merged-loc-probs NIL)
-              (setf expectations-list
-                    (cons (make-instance 'next-location-expectation
-                            :next-location-probdist last-merged-loc-probs
-                            :next-location location-observation
-                            :ready-for-validation T)
-                          expectations-list)))
+            (setf expectations-list
+                  (cons (make-instance 'next-location-expectation
+                          :next-location-probdist (next-location-probdist e)
+                          :next-location location-observation
+                          :ready-for-validation T)
+                        expectations-list))
             (setf found-exp T)))
         (setf expectations-list (cons e expectations-list))))
     (when (eq found-exp NIL)

@@ -7,13 +7,14 @@
       (full-spatial-model NIL) (hmm (make-instance 'hmm)) (plan-probs NIL) ;; (merged-plan-probs NIL)
       (plan-library (generate-stpr-library)) (good-plan-observations NIL) (last-stop-pose NIL)
       (last-motion-data NIL) (last-location-observation NIL) (last-duration 0)
-      (merged-loc-probs NIL) (normality-tree NIL)
+      ;; (merged-loc-probs NIL)
+      (normality-tree NIL)
       ;; (plan-object-hits NIL)
       ;;(walking-dir-publisher (roslisp:advertise "walking_dir" "geometry_msgs/Pose"))
       (walking-dir-publisher NIL)
-      (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL) (start-flag NIL)
+      (monitoring-belief NIL) (merged-belief NIL) (location-observation NIL)
       (last-semantic-location-observation) ;; needed for expectations since hmm-internal updated to fast
-      (max-loc-duration-table NIL) (last-merged-loc-probs NIL)
+      (max-loc-duration-table NIL)
       (current-location-observation NIL))
     ;; Starts watchdog that checks if human is standing still
   (defun start-observation-watchdog ()
@@ -150,7 +151,7 @@
                          (create-or-update-duration-expectation current-location-observation
                                                       (gethash (string current-location-observation)
                                                                max-loc-duration-table)))
-                  (format t "I guess human will stay maximally ~s s at ~s~%"
+                  (format t "~%--- I guess human will stay maximally ~s s at ~s ---~%"
                           (gethash (string current-location-observation) max-loc-duration-table)
                           current-location-observation)))
               
@@ -187,13 +188,22 @@
                               (unless (string= location-observation (last-observation hmm))
                                 (setf last-semantic-location-observation location-observation))
                               (setf location-observation (string (label (get-most-likely-gaussian motion-data full-spatial-model))))
+                              (setf last-semantic-location-observation (last-observation hmm))
                               (add-observation-to-hmm
                                location-observation
                                objects-cache
                                duration
                                hmm)
+                            
+                              (unless (string= location-observation last-semantic-location-observation)
+                                (format t "Add exp")
+                                (addgv :expectations 'human-expectations
+                                       (create-or-update-loc-exps-from-prob-dist
+                                        (normalize-belief (forward-step-belief  hmm)) location-observation)))
+                              
                               (setf last-duration 0)
                               (setf plan-probs (calculate-plan-probabilities (belief hmm)))
+
                               
                               ;; Incorporate object detections
                               ;; (setf plan-object-hits (calculate-object-confidence-without-locations plan-library objects-cache last-motion-data full-spatial-model))
@@ -240,18 +250,6 @@
                                      (penalyze-beliefs (normalize-belief (forward-step-belief hmm)) monitoring-belief)))
                               (write-loc-probs-to-csv
                                merged-belief "~/Desktop/loc-probs.csv")
-
-                              (unless (string=
-                                       location-observation
-                                       last-semantic-location-observation)
-                                (progn
-                                  (unless (eq merged-loc-probs NIL)
-                                    (setf last-merged-loc-probs (normalize-belief merged-loc-probs)))
-                                  (setf merged-loc-probs (merge-loc-probs (forward-step-belief hmm)))
-                                  (addgv :expectations 'human-expectations
-                                         (create-or-update-loc-exps-from-prob-dist
-                                          (normalize-belief merged-loc-probs) location-observation last-merged-loc-probs)))
-                                (setf start-flag 1))
                               ;; Reset object cache when observations was added
                               (setf objects-cache NIL)))
                           (progn
