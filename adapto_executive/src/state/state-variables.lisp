@@ -4,6 +4,7 @@
 (create-global-structure :human)
 (create-global-structure :furniture)
 (create-global-structure :kitchen-object)
+(create-global-structure :doors)
 
 
 

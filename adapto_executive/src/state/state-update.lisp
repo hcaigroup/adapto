@@ -55,21 +55,47 @@
                                       (tf:make-quaternion qx qy qz qw)))  ; rotation/orientation
                       :max-tracing-freq 5))) ; do fluent tracing only with 5 Hz
 
-;; Updates Object data from list of objects. Objects have format: ( Name Description x y z qx qy qz qw ) (qx, qy, qz, qw refer to objects' rotation as qaternion )
+(defun create-door (name hinge door-open description)
+  (format t ">>>>>>>>>>>>>>>>>> Creating statevar for door ~s~%" name)
+  (when (eq description NIL) (setf description ""))
+  (addgv :doors name
+         (make-fluent :name name
+                      :value (make-instance 'door
+                               :hinge hinge
+                               :door-open door-open
+                               :description description)
+                      :max-tracing-freq 5)))
+
+(defun store-door-data (data)
+  (let ((*package* (find-package :ad-exe)))
+    (dolist (door-data (read-from-string (std_msgs-msg:data data)))
+      (destructuring-bind (description name hinge door-open) door-data
+        (cond ((isgv :doors name)
+                ;; Last detection is closed or open
+                (setf (last-detection (value (getgv :doors name)))
+                      (door-open (value (getgv :doors name))))
+               (setf (door-open (value (getgv :doors name))) door-open)
+               (pulse (getgv :doors name)))
+              (t
+                (create-door name hinge door-open description)
+                 (pulse (getgv :doors name))))))))
+
+;; Updates Object data from list of objects. Objects have format: ( Name Description x y z qx qy qz qw )
+;; (qx, qy, qz, qw refer to objects' rotation as qaternion )
 (defun store-object-data (data)
   (let ( (*package* (find-package :ad-exe)) )
     (dolist (obj-data (read-from-string (std_msgs-msg:data data)))
       (destructuring-bind (name type x y z qx qy qz qw) obj-data      
         (cond  ((isgv :kitchen-object name)
-                 (setf (last-detection (value (getgv :kitchen-object name))) (pose (value (getgv :kitchen-object name))))
+                 (setf (last-detection (value (getgv :kitchen-object name)))
+                       (pose (value (getgv :kitchen-object name))))
                  (setf (pose (value (getgv :kitchen-object name)))
                   (tf:make-pose-stamped
                    "map"
                    (roslisp:ros-time)
                    (cl-transforms:make-3d-vector x y z)
                    ;; (cl-transforms:make-quaternion qx qy qz qw)
-                   (cl-transforms:make-quaternion 0 0 0 1)
-                   ))
+                   (cl-transforms:make-quaternion 0 0 0 1)))
                 (pulse (getgv :kitchen-object name)))
                (t (create-object name type x y z qx qy qz qw)
                  (pulse (getgv :kitchen-object name))))))))
@@ -84,7 +110,7 @@
                  ;; ("/pr2/CameraMain" "std_msgs/String" store-object-data)
                  ;; ("/objects_relative_to_map" "std_msgs/String" store-object-data)
                  ("/james/semantic_camera" "std_msgs/String" store-object-data)
-                 ))
+                 ("/james/semantic_door_cam" "std_msgs/String" store-door-data)))
        (subscribers '()) )
   (defun start-statevar-update ()
     (dolist (top topics)

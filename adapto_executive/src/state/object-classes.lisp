@@ -42,7 +42,13 @@
 
 (defclass cube (entity cuboid) ())
 
-; furniture
+(defclass door (entity)
+  ( (hinge :initarg :hinge :accessor hinge)
+    (door-open :initarg :door-open :accessor door-open)
+    (description :initarg :description :accessor description)))
+                                        
+;; furniture
+
 (defclass furniture (entity) ())
 
 (defclass cuboard (furniture cuboid)
