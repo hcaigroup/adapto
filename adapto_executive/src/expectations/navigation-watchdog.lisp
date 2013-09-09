@@ -58,8 +58,8 @@
     (setf path-length (apply '+ distances-waypoints))
     
     ;; Generate an navigation-expectation of it not already exists
-    (unless (isgv :robot-navigation-expectations 'time-to-goal)
-        (addgv :robot-navigation-expectations 'time-to-goal (make-instance 'navigation-action-expectation
+    (unless (isgv :expectations 'time-to-goal)
+        (addgv :expectations 'time-to-goal (make-instance 'navigation-action-expectation
                                          ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!! (at the moment just set 0.3)
                                          :duration (/ path-length 0.15)
                                          :start-time (roslisp:ros-time)
@@ -87,7 +87,7 @@
     (unless (eq [cpm:pm-status :navigation] :RUNNING)
       (when (eq last_navp 1)
         (roslisp:unsubscribe subscriber)
-        (remgv :robot-navigation-expectations 'time-to-goal)
+        (remgv :expectations 'time-to-goal)
         (format t "-:NAVIGATION ENDED")))
     ;; Save last status 
     (if (eq [cpm:pm-status :navigation] :RUNNING)
