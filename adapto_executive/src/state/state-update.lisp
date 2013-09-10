@@ -58,6 +58,9 @@
 (defun create-door (name hinge door-open description)
   (format t ">>>>>>>>>>>>>>>>>> Creating statevar for door ~s~%" name)
   (when (eq description NIL) (setf description ""))
+  (if (string= (string door-open) "TRUE")
+    (setf door-open T)
+    (setf door-open NIL))
   (addgv :doors name
          (make-fluent :name name
                       :value (make-instance 'door
@@ -70,6 +73,9 @@
   (let ((*package* (find-package :ad-exe)))
     (dolist (door-data (read-from-string (std_msgs-msg:data data)))
       (destructuring-bind (description name hinge door-open) door-data
+        (if (string= (string door-open) "TRUE")
+          (setf door-open T)
+          (setf door-open NIL))
         (cond ((isgv :doors name)
                 ;; Last detection is closed or open
                 (setf (last-detection (value (getgv :doors name)))

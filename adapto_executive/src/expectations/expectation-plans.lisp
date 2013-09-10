@@ -149,6 +149,7 @@
   (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
   (setf (last-detection (value (getgv :kitchen-object 'TV)))
         (pose (value (getgv :kitchen-object 'TV))))
+  (addgv :doors 'DOOR_ENTRANCE (create-door "DOOR_ENTRANCE" "left" NIL ""))
 
   (addgv :expectations 'object-expectations
          (make-instance 'expectations-category
@@ -177,6 +178,15 @@
                                          :y -5.23)
                                  :pose (fl-funcall #'pose (getgv :human 'louis))))))
 
+  (addgv :expectations 'world-expectations
+         (make-instance 'expectations-category
+           :expectations-list (list
+                               (make-instance 'door-expectation
+                                 :door-name "DOOR_ENTRANCE"
+                                 :expected-open NIL
+                                 :is-open (fl-funcall #'door-open
+                                                      (getgv :doors 'DOOR_ENTRANCE))))))
+  
   (par
      (start-continual-expectation-validation 2)
     )

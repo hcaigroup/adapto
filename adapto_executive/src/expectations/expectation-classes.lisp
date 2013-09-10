@@ -20,6 +20,12 @@
    (pose :initarg :pose :accessor pose)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
+;; Expectations if door is expected to be open or not
+(defclass door-expectation (expectation)
+  ((door-name :initarg :door-name :accessor door-name)
+   (expected-open :initarg :expected-open :accessor expected-open)
+   (is-open :initarg :is-open :accessor is-open)))
+
 (defclass next-location-expectation (probabilistic-expectation)
   ((next-location-probdist :initarg :next-location-probdist :accessor next-location-probdist)
    (next-location :initarg :next-location :accessor next-location)))
@@ -67,6 +73,12 @@
 (defmethod validate-expectation ((exp position-expectation))
   "Returns 1 if POSE of POSITION-EXPECTATION is inside AREA, else returns 0"
   (if (inside-area (area exp) (pose exp))
+    1
+    0))
+
+(defmethod validate-expectation ((exp door-expectation))
+  "Returns 1 if is-open = expected-open, else returns 0"
+  (if (string= (string (expected-open exp)) (string (value (is-open exp)))) 
     1
     0))
 
