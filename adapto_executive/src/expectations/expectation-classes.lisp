@@ -104,7 +104,8 @@
   "Non-generic function to check if navigation action is finished in expected time using fixed
    value for average robot speed."
   (let ((time-since-start (- (roslisp:ros-time) (start-time exp))))
-    ;; (format t "Navigation-action should take ~s seconds for path of length ~s ~%" (duration exp) (path-length exp))
+    ;; (format t "Navigation-action should take ~s seconds for path of length ~s ~%" (duration exp)
+    ;; (path-length exp))
     ;; (format t "Navigation-action in progress since ~s seconds~%" time-since-start)
     (cond
       ;; As long as action within the expected time, return 1
@@ -112,18 +113,14 @@
       ;; expected time has passed but not more than 1.25 the time
       ((and (< (- (duration exp) time-since-start) 0)                             ;; diff smaller 0
             (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 4))))  ;; and bigger -¼*duration
-        (format t "Navigation takes a little longer, still no reason to worry...")
        0.75) ;; return 0.75
       ;; expected time has passed but not more than 1.5 the time
-      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 4)) )                             ;; diff smaller 0
+      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 4)) )  ;; diff smaller 0
             (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 2))))  ;; and bigger -¼*duration
-        (format t "There could be someting wrong with my navigation-plan....")
        0.5) ;; return 0.75
       ;; expected time has passed but not more than 2x the time
-      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 2)) )                             ;; diff smaller 0
+      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 2)) )  ;; diff smaller 0
             (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 1))))  ;; and bigger -¼*duration
-        (format t "I think there IS something wrong with my navigation")
        0.25) ;; return 0.75
       ((< (- (duration exp) time-since-start) (* -1 (duration exp)))
-        (format t "Navigation alread takes 2 times longer... time to PANIC!!!!")
        0))))
