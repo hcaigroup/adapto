@@ -13,13 +13,8 @@
 ;; NOTE: distance value for simulation should be lower (0.005?)
 (defmethod has-moved (thing)
   "Return T if object has moved since last detection"
-  (format t "Validating obj exp of ~s~%" thing)
-  (format t "Pose: ~s~%" (cl-transforms:origin [ (pose thing)]))
-  (format t "Last detection: ~s~%" (last-detection thing))
-  
   (let ((has-moved-p
         (unless (null (last-detection thing))
-          (format t "Found last detection~%")
           (> (cl-transforms:v-dist
               (cl-transforms:origin [(pose thing)])
               (cl-transforms:origin [(last-detection thing)]))

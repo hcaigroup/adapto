@@ -149,7 +149,7 @@
   (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
   (setf (last-detection (value (getgv :kitchen-object 'TV)))
         (pose (value (getgv :kitchen-object 'TV))))
-  
+
   (addgv :expectations 'TV-static
           (make-instance 'object-expectation
             :object (make-instance 'thing
@@ -158,6 +158,13 @@
                       :last-detection (fl-funcall #'last-detection
                                                   (getgv :kitchen-object 'TV)))
             :flexible NIL))
+
+  (addgv :expectations 'TV-in-livingroom (make-instance 'position-expectation
+                                    :area (make-instance 'moving-circle
+                                            :radius 2
+                                            :x 2.738
+                                            :y 1.230)
+                                    :pose (fl-funcall #'pose (getgv :kitchen-object 'TV))))
 
   (par
      (start-continual-expectation-validation 2)
