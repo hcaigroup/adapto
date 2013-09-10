@@ -81,7 +81,8 @@
       )))
 
 ;; Navigate to 3 points in apartment and monitor time of navigation-action
-(def-top-level-plan apartment-task()
+(def-top-level-plan apartment-patrol-task()
+  (startup-ros)
   (start-statevar-update)
   (init-expectations)
   ;; (generate-location-expectations)
@@ -95,12 +96,12 @@
        ( loc2-desig 
          (location `((pose 
                       ,(tf:make-pose-stamped "/map" 0.0 
-                                             (tf:make-3d-vector 0.0824 -4.234 0.0) 
+                                             (tf:make-3d-vector -0.85 -2.05 0.0) 
                                              (tf:euler->quaternion :az 0.121))))))
        ( loc3-desig 
          (location `((pose 
                       ,(tf:make-pose-stamped "/map" 0.0 
-                                             (tf:make-3d-vector 4.207 -0.277 0.0) 
+                                             (tf:make-3d-vector 4.338 -1.259 0.0) 
                                              (tf:euler->quaternion :az 1.874))))))
        ( loc4-desig 
          (location `((pose 
@@ -111,17 +112,18 @@
     (par
       (maybe-run-process-modules)
       (start-navigation-watchdog)
+      (start-continual-expectation-validation 2)
       (seq 
         (cram-process-modules:pm-execute :navigation loc1-desig)
-        (sleep 2)
+        (sleep 1)
         (cram-process-modules:pm-execute :navigation loc2-desig)
-        (sleep 2)
+        (sleep 1)
         (cram-process-modules:pm-execute :navigation loc3-desig)
-        (sleep 2)
+        (sleep 1)
         (cram-process-modules:pm-execute :navigation loc4-desig))
-      
-      ;; (start-expectation-validation)
       )))
+
+
 
 ;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
 ;; probabilities about human task execution and use those to generate expectations
@@ -141,8 +143,7 @@
       (start-observation-watchdog)      
       (maybe-run-process-modules)
       (seq 
-        (cram-process-modules:pm-execute :navigation loc1-desig))
-      )))
+        (cram-process-modules:pm-execute :navigation loc1-desig)))))
 
 (def-top-level-plan garching-minimal()
   ;; (start-statevar-update)
