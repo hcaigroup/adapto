@@ -88,20 +88,10 @@
   (startup-ros)
   (start-statevar-update)
   (init-expectations)
-  ;; (generate-location-expectations)
-
-  (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'TV)))
-        (pose (value (getgv :kitchen-object 'TV))))
   
-  (addgv :expectations 'TV-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'TV))
-                      :last-detection (fl-funcall #'last-detection
-                                                  (getgv :kitchen-object 'TV)))
-            :flexible NIL))
+  (create-apartment-object-expectations)
+  (create-apartment-human-expectations)
+  (create-apartment-world-expectations)
 
   (with-designators 
       (( loc1-desig 
@@ -138,36 +128,29 @@
         (sleep 1)
         (cram-process-modules:pm-execute :navigation loc4-desig)))))
 
-;; Navigate to 3 points in apartment and monitor time of navigation-action
-(def-top-level-plan apartment-kitchen-task()
-  (startup-ros)
-  (start-statevar-update)
-  (init-expectations)
-  ;; (generate-location-expectations)
-
+(defun create-apartment-object-expectations ()
   ;; NEEDED TO INIT VALUES OF KITCHEN OBJECTS! TODO: BETTER SOLUTION!!!
   (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
   (setf (last-detection (value (getgv :kitchen-object 'TV)))
         (pose (value (getgv :kitchen-object 'TV))))
-  (addgv :doors 'DOOR_ENTRANCE (create-door "DOOR_ENTRANCE" "left" NIL ""))
-
   (addgv :expectations 'object-expectations
          (make-instance 'expectations-category
            :expectations-list (list
-                              (make-instance 'object-expectation
-                                :object (make-instance 'thing
-                                          :pose (fl-funcall #'pose
-                                                            (getgv :kitchen-object 'TV))
-                                          :last-detection (fl-funcall #'last-detection
-                                                                      (getgv :kitchen-object 'TV)))
-                                :flexible NIL)
-                              (make-instance 'position-expectation
-                                :area (make-instance 'moving-circle
-                                        :radius 2
-                                        :x 2.738
-                                        :y 1.230)
-                                :pose (fl-funcall #'pose (getgv :kitchen-object 'TV))))))
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'TV))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'TV)))
+                                 :flexible NIL)
+                               (make-instance 'position-expectation
+                                 :area (make-instance 'moving-circle
+                                         :radius 2
+                                         :x 2.738
+                                         :y 1.230)
+                                 :pose (fl-funcall #'pose (getgv :kitchen-object 'TV)))))))
 
+(defun create-apartment-human-expectations ()
   (addgv :expectations 'human-expectations
          (make-instance 'expectations-category
            :expectations-list (list
@@ -176,8 +159,10 @@
                                          :radius 2
                                          :x 3.67
                                          :y -5.23)
-                                 :pose (fl-funcall #'pose (getgv :human 'louis))))))
+                                 :pose (fl-funcall #'pose (getgv :human 'louis)))))))
 
+(defun create-apartment-world-expectations ()
+  (addgv :doors 'DOOR_ENTRANCE (create-door "DOOR_ENTRANCE" "left" NIL ""))
   (addgv :expectations 'world-expectations
          (make-instance 'expectations-category
            :expectations-list (list
@@ -185,12 +170,21 @@
                                  :door-name "DOOR_ENTRANCE"
                                  :expected-open NIL
                                  :is-open (fl-funcall #'door-open
-                                                      (getgv :doors 'DOOR_ENTRANCE))))))
+                                                      (getgv :doors 'DOOR_ENTRANCE)))))))
+
+
+;; Navigate to 3 points in apartment and monitor time of navigation-action
+(def-top-level-plan apartment-kitchen-task()
+  (startup-ros)
+  (start-statevar-update)
+  (init-expectations)
+
+  (create-apartment-object-expectations)
+  (create-apartment-human-expectations)
+  (create-apartment-world-expectations)
   
   (par
-     (start-continual-expectation-validation 2)
-    )
-  )
+     (start-continual-expectation-validation 2)))
 
 ;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
 ;; probabilities about human task execution and use those to generate expectations

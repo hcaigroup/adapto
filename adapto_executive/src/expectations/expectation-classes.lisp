@@ -108,7 +108,6 @@
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
   (cond
      ((and (has-moved (object exp)) (not (flexible exp)))
-       (format t "An object moved unexpectedly...~%")
        0)
      (t 1)))
 
