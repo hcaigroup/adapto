@@ -150,21 +150,32 @@
   (setf (last-detection (value (getgv :kitchen-object 'TV)))
         (pose (value (getgv :kitchen-object 'TV))))
 
-  (addgv :expectations 'TV-static
-          (make-instance 'object-expectation
-            :object (make-instance 'thing
-                      :pose (fl-funcall #'pose
-                                        (getgv :kitchen-object 'TV))
-                      :last-detection (fl-funcall #'last-detection
-                                                  (getgv :kitchen-object 'TV)))
-            :flexible NIL))
+  (addgv :expectations 'object-expectations
+         (make-instance 'expectations-category
+           :expectations-list (list
+                              (make-instance 'object-expectation
+                                :object (make-instance 'thing
+                                          :pose (fl-funcall #'pose
+                                                            (getgv :kitchen-object 'TV))
+                                          :last-detection (fl-funcall #'last-detection
+                                                                      (getgv :kitchen-object 'TV)))
+                                :flexible NIL)
+                              (make-instance 'position-expectation
+                                :area (make-instance 'moving-circle
+                                        :radius 2
+                                        :x 2.738
+                                        :y 1.230)
+                                :pose (fl-funcall #'pose (getgv :kitchen-object 'TV))))))
 
-  (addgv :expectations 'TV-in-livingroom (make-instance 'position-expectation
-                                    :area (make-instance 'moving-circle
-                                            :radius 2
-                                            :x 2.738
-                                            :y 1.230)
-                                    :pose (fl-funcall #'pose (getgv :kitchen-object 'TV))))
+  (addgv :expectations 'human-expectations
+         (make-instance 'expectations-category
+           :expectations-list (list
+                               (make-instance 'position-expectation
+                                 :area (make-instance 'moving-circle
+                                         :radius 2
+                                         :x 3.67
+                                         :y -5.23)
+                                 :pose (fl-funcall #'pose (getgv :human 'louis))))))
 
   (par
      (start-continual-expectation-validation 2)
