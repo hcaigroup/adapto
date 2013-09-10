@@ -80,13 +80,29 @@
       ;; (start-expectation-validation)
       )))
 
+
+
+
 ;; Navigate to 3 points in apartment and monitor time of navigation-action
 (def-top-level-plan apartment-patrol-task()
   (startup-ros)
   (start-statevar-update)
   (init-expectations)
   ;; (generate-location-expectations)
+
+  (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'TV)))
+        (pose (value (getgv :kitchen-object 'TV))))
   
+  (addgv :expectations 'TV-static
+          (make-instance 'object-expectation
+            :object (make-instance 'thing
+                      :pose (fl-funcall #'pose
+                                        (getgv :kitchen-object 'TV))
+                      :last-detection (fl-funcall #'last-detection
+                                                  (getgv :kitchen-object 'TV)))
+            :flexible NIL))
+
   (with-designators 
       (( loc1-desig 
          (location `((pose 
@@ -120,10 +136,33 @@
         (sleep 1)
         (cram-process-modules:pm-execute :navigation loc3-desig)
         (sleep 1)
-        (cram-process-modules:pm-execute :navigation loc4-desig))
-      )))
+        (cram-process-modules:pm-execute :navigation loc4-desig)))))
 
+;; Navigate to 3 points in apartment and monitor time of navigation-action
+(def-top-level-plan apartment-kitchen-task()
+  (startup-ros)
+  (start-statevar-update)
+  (init-expectations)
+  ;; (generate-location-expectations)
 
+  ;; NEEDED TO INIT VALUES OF KITCHEN OBJECTS! TODO: BETTER SOLUTION!!!
+  (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'TV)))
+        (pose (value (getgv :kitchen-object 'TV))))
+  
+  (addgv :expectations 'TV-static
+          (make-instance 'object-expectation
+            :object (make-instance 'thing
+                      :pose (fl-funcall #'pose
+                                        (getgv :kitchen-object 'TV))
+                      :last-detection (fl-funcall #'last-detection
+                                                  (getgv :kitchen-object 'TV)))
+            :flexible NIL))
+
+  (par
+     (start-continual-expectation-validation 2)
+    )
+  )
 
 ;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
 ;; probabilities about human task execution and use those to generate expectations
