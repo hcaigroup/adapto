@@ -24,6 +24,15 @@
   (let ((normalities (map-global-structure 'validate-expectation :expectations)))
     normalities))
 
+(defun start-continual-expectation-validation (seconds)
+  (let ((last-validation-time 0) (average-normality NIL))
+    (format t "-- Normality-tree: ~s~%" (validate-expectations))
+    (setf average-normality (validate-expectations))
+    (setf last-validation-time (roslisp:ros-time))
+    (sleep seconds)
+    (unless (eq (get-global-structure :expectations) NIL)
+      (start-continual-expectation-validation seconds))))
+
 
 
     

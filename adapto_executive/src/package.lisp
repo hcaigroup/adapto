@@ -26,8 +26,9 @@
   (:shadowing-import-from #:desig
                           #:name)
   (:import-from :cram-utilities
-                #:map-global-structure #:create-global-structure #:remove-global-structure #:clear-global-structure
-                #:addgv #:isgv #:getgv #:setgv #:remgv #:putgv #:var-value #:show-global-structure)
+                #:map-global-structure #:create-global-structure #:remove-global-structure #:get-global-structure
+                #:clear-global-structure #:addgv #:isgv #:getgv #:setgv #:remgv #:putgv #:var-value
+                #:show-global-structure)
   (:import-from :cram-roslisp-common
                 #:startup-ros
                 #:shutdown-ros)

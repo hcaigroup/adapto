@@ -60,7 +60,8 @@
     ;; Generate an navigation-expectation of it not already exists
     (unless (isgv :expectations 'time-to-goal)
         (addgv :expectations 'time-to-goal (make-instance 'navigation-action-expectation
-                                         ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!! (at the moment just set 0.3)
+                                         ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!!
+                                         ;; (at the moment just set 0.3)
                                          :duration (/ path-length 0.15)
                                          :start-time (roslisp:ros-time)
                                          :path-length path-length
@@ -80,19 +81,22 @@
       ;; (format t "-")
       ;; check if navigaton action has just started and subscribe to navigation plan
       (when (eq last_navp 0)
-        (format t "STARTED NAVIGATION:")
-        (setf subscriber (roslisp:subscribe "/move_base/NavfnROS/plan" "nav_msgs/Path" #'calculate-time :max-queue-length 1))
-        ))
+        (format t "STARTED NAVIGATION, creating expectation:")
+        (setf subscriber
+              (roslisp:subscribe "/move_base/NavfnROS/plan"
+                                 "nav_msgs/Path"
+                                 #'calculate-time :max-queue-length 1))))
+    
     ;; Check if navigation-action has ended and unsubscribe
     (unless (eq [cpm:pm-status :navigation] :RUNNING)
       (when (eq last_navp 1)
         (roslisp:unsubscribe subscriber)
         (remgv :expectations 'time-to-goal)
-        (format t "-:NAVIGATION ENDED")))
+        (format t "-:NAVIGATION ENDED, removed expectation")))
     ;; Save last status 
     (if (eq [cpm:pm-status :navigation] :RUNNING)
       (setf last_navp 1)
       (setf last_navp 0))
-    (sleep 1)
+    (sleep 2)
     (start-navigation-watchdog)))
     
