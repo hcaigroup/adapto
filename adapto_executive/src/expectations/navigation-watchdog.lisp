@@ -84,7 +84,7 @@
       ;; (format t "-")
       ;; check if navigaton action has just started and subscribe to navigation plan
       (when (eq last_navp 0)
-        (format t "STARTED NAVIGATION, creating expectation:")
+        ;; (format t "STARTED NAVIGATION, creating expectation:")
         (setf subscriber
               (roslisp:subscribe "/move_base/NavfnROS/plan"
                                  "nav_msgs/Path"
@@ -95,7 +95,8 @@
       (when (eq last_navp 1)
         (roslisp:unsubscribe subscriber)
         (remgv :expectations 'robot-expectations)
-        (format t "-:NAVIGATION ENDED, removed expectation")))
+        ;; (format t "-:NAVIGATION ENDED, removed expectation")
+        ))
     ;; Save last status 
     (if (eq [cpm:pm-status :navigation] :RUNNING)
       (setf last_navp 1)

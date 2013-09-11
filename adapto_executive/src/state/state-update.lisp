@@ -42,9 +42,10 @@
 
 ;; Creates one object from object data
 (defun create-object (name type x y z qx qy qz qw )
-  (format t ">>>>>>>>>>>>>>>>>>> Creating statevar for object ~s~%" name)
+  ;; (format t ">>>>>>>>>>>>>>>>>>> Creating statevar for object ~s~%" name)
   (when (null  (find-class type NIL))
-    (warn "[state-update.lisp]: Class for type ~a not defined. Mapped to type thing~%" type) (setf type 'thing))
+    ;; (warn "[state-update.lisp]: Class for type ~a not defined. Mapped to type thing~%" type)
+    (setf type 'thing))
   (addgv :kitchen-object name
          (make-fluent :name name
                       :value (make-instance type
@@ -56,7 +57,7 @@
                       :max-tracing-freq 5))) ; do fluent tracing only with 5 Hz
 
 (defun create-door (name hinge door-open description)
-  (format t ">>>>>>>>>>>>>>>>>> Creating statevar for door ~s~%" name)
+  ;; (format t ">>>>>>>>>>>>>>>>>> Creating statevar for door ~s~%" name)
   (when (eq description NIL) (setf description ""))
   (if (string= (string door-open) "TRUE")
     (setf door-open T)

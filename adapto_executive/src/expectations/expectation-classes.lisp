@@ -50,6 +50,8 @@
 
 (defclass navigation-action-expectation (action-expectation)
   ((action-type :initarg :action-type :accessor action-type :initform 'navigation )
+   (duration :initarg :duration :accessor duration)
+   (start-time :initarg :start-time :accessor start-time)
    (path-length :initarg :path-length :accessor path-length)
    (avg-speed :initarg :avg-speed :accessor :avg-speed)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
@@ -102,7 +104,9 @@
                delta-t
                (max-expected-duration exp))
               (max-expected-duration exp))))
-      1)))
+      1)
+
+    ))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
@@ -114,24 +118,16 @@
 (defmethod validate-expectation ((exp navigation-action-expectation))
   "Non-generic function to check if navigation action is finished in expected time using fixed
    value for average robot speed."
-  (let ((time-since-start (- (roslisp:ros-time) (start-time exp))))
+  (let ((delta-t (- (roslisp:ros-time) (start-time exp))))
     ;; (format t "Navigation-action should take ~s seconds for path of length ~s ~%" (duration exp)
     ;; (path-length exp))
     ;; (format t "Navigation-action in progress since ~s seconds~%" time-since-start)
-    (cond
-      ;; As long as action within the expected time, return 1
-      ((> (- (duration exp) time-since-start) 0) 1)
-      ;; expected time has passed but not more than 1.25 the time
-      ((and (< (- (duration exp) time-since-start) 0)                             ;; diff smaller 0
-            (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 4))))  ;; and bigger -¼*duration
-       0.75) ;; return 0.75
-      ;; expected time has passed but not more than 1.5 the time
-      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 4)) )  ;; diff smaller 0
-            (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 2))))  ;; and bigger -¼*duration
-       0.5) ;; return 0.75
-      ;; expected time has passed but not more than 2x the time
-      ((and (< (- (duration exp) time-since-start) (* -1 (/ (duration exp) 2)) )  ;; diff smaller 0
-            (> (- (duration exp) time-since-start) (* -1 (/ (duration exp) 1))))  ;; and bigger -¼*duration
-       0.25) ;; return 0.75
-      ((< (- (duration exp) time-since-start) (* -1 (duration exp)))
-       0))))
+    (if (> delta-t (duration exp))
+        (if (> delta-t (* 2 (duration exp)))
+            0
+            (- 1 (/
+                  (-
+                   delta-t
+                   (duration exp))
+                  (duration exp))))
+        1)))
