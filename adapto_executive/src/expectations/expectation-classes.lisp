@@ -77,7 +77,6 @@
     normality-list))
 
 (defmethod validate-expectation ((exp object-on-floor-expectation))
-  (format t "FLOOR CHECK~%")
   (let ((is-on-floor NIL))
    (when (<
           (float
@@ -85,9 +84,6 @@
             (cl-transforms:origin [(pose (object exp))])))
           0.3)
      (setf is-on-floor T))
-   (format t "Found object at z=~s~%"
-           (cl-transforms:z
-            (cl-transforms:origin [(pose (object exp))])))
    (if (eq (expected-on-floor exp) is-on-floor)
      1
      0)))

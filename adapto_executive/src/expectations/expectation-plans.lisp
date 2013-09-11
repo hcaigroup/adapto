@@ -188,27 +188,154 @@
                                                       (getgv :doors 'DOOR_ENTRANCE)))))))
 
 
-;; Navigate to 3 points in apartment and monitor time of navigation-action
-(def-top-level-plan apartment-kitchen-task()
-  (startup-ros)
-  (start-statevar-update)
-  (init-expectations)
+(defun create-kitchen-objects-expectations ()
 
+  ;; TODO: Clean up code, make more modular, get init objects out of here
+  ;; Make funtion to init list of objects
   (addgv :kitchen-object 'Fork (create-object 'Fork "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Fork)))
+        (pose (value (getgv :kitchen-object 'Fork))))
+  (addgv :kitchen-object 'Knife (create-object 'Knife "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Knife)))
+        (pose (value (getgv :kitchen-object 'Knife))))
+  (addgv :kitchen-object 'Nutella (create-object 'Nutella "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Nutella)))
+        (pose (value (getgv :kitchen-object 'Nutella))))
+  (addgv :kitchen-object 'Jam (create-object 'Jam "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Jam)))
+        (pose (value (getgv :kitchen-object 'Jam))))
+  (addgv :kitchen-object 'Cornflakes (create-object 'Cornflakes "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Cornflakes)))
+        (pose (value (getgv :kitchen-object 'Cornflakes))))
+  (addgv :kitchen-object 'Bowl (create-object 'Bowl "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Bowl)))
+        (pose (value (getgv :kitchen-object 'Bowl))))
+  (addgv :kitchen-object 'Plate (create-object 'Plate "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Plate)))
+        (pose (value (getgv :kitchen-object 'Plate))))
+  
+  (addgv :kitchen-object 'Kitchen_Table (create-object 'Kitchen_Table "thing" 0 0 2 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object 'Kitchen_Table)))
+        (pose (value (getgv :kitchen-object 'Kitchen_Table))))
+
   (addgv :expectations 'object-expectations
          (make-instance 'expectations-category
            :expectations-list (list
+                               ;; TODO: Make wrapper for generating expectations, so far really ugly
+                               ;; Implementation due to ACE Deadline really close ...
+                               ;; ------------ NOT ON GROUND EXP
                                (make-instance 'object-on-floor-expectation
                                  :object (make-instance 'thing
                                            :pose (fl-funcall #'pose
                                                              (getgv :kitchen-object 'Fork))
                                            :last-detection NIL)
                                  :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Knife))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Jam))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Nutella))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Cornflakes))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Bowl))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Plate))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+
+                               ;; ----------- DOES-NOT-MOVE-EXP
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Knife))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Knife)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Nutella))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Nutella)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Fork))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Fork)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Jam))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Jam)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Cornflakes))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Cornflakes)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Bowl))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Bowl)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Plate))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Plate)))
+                                 :flexible NIL)
+                               (make-instance 'object-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Kitchen_Table))
+                                           :last-detection (fl-funcall #'last-detection
+                                                                       (getgv :kitchen-object 'Kitchen_Table)))
+                                 :flexible NIL)
                                
-                           )))
+                           ))))
+
+;; Monitor the kitchen table
+(def-top-level-plan apartment-kitchen-task()
+  (startup-ros)
+  (start-statevar-update)
+  (init-expectations)
+  (create-kitchen-objects-expectations)
   
   (par
-     (start-continual-expectation-validation 2)))
+     (start-continual-expectation-validation 1)))
 
 ;; Plan for Garching Test scenario: Navigate while using SPRAM module to estimate
 ;; probabilities about human task execution and use those to generate expectations

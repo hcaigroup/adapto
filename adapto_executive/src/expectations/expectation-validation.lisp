@@ -32,7 +32,7 @@
 (defun start-continual-expectation-validation (seconds)
   (let ((last-validation-time 0) (avg-normality NIL))
     (setf avg-normality (average-normality (validate-expectations)))
-    (format t "Avg normality: [~s] -- Normality-tree: ~s~%"
+    (format t "Avg normality: [~s] ~% Normality-tree: ~s~%"
             avg-normality
             (validate-expectations))
     ;; OUTPUT FOR ACS PAPER

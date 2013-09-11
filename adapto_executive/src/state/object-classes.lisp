@@ -18,11 +18,12 @@
           (> (cl-transforms:v-dist
               (cl-transforms:origin [(pose thing)])
               (cl-transforms:origin [(last-detection thing)]))
-             0.1 ))))
-    ;; (format t "--- has_moved: distance ~s~%"
+             0.2 ))))
+    ;; (unless (null (last-detection thing))
+    ;;   (format t "--- has_moved: distance ~s~%"
     ;;         (cl-transforms:v-dist
     ;;          (cl-transforms:origin [(pose thing)])
-    ;;          (cl-transforms:origin (last-detection thing))))
+    ;;          (cl-transforms:origin [(last-detection thing)]))))
     has-moved-p))
 
 ;; agents
