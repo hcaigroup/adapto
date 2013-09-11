@@ -116,13 +116,20 @@
     (return-from get-short-plan-name (gethash (string full-name) plan-mapping))))
 
 (defun visualize-plan-probs (plan-probs)
-  "Visualization for plan probabilities of HHMM (to be used with rxplot).x"
+  "Visualization for plan probabilities of HHMM (to be used with rxplot)."
     (maphash #'(lambda (plan prob)
                  (let ((pub (roslisp:advertise
                              (concatenate 'string "HMM-" (string plan))
                              "std_msgs/Float32")))
                    (roslisp:publish-msg pub :data (* 100 prob))))
              plan-probs))
+
+(defun visualize-normality (normality)
+  "Visualization for average normality (to be used with rxplot)."
+  (let ((pub (roslisp:advertise
+              "avg-normality"
+              "std_msgs/Float32")))
+    (roslisp:publish-msg pub :data normality)))
 
 (defun visualize-particleset (particleset plan-library)
   "Visualization of plan probabilities using Particle filter (for rxplot)"
@@ -365,6 +372,14 @@ is replaced with replacement."
                    (incf i 1))
                plan-probs)
       (format file "~s~%" (roslisp:ros-time)))))
+
+(defun write-average-normality (filename normality)
+  "Writes a csv-file of normality values and the time"
+  (with-open-file (file filename
+                        :direction :output
+                        :if-exists :append
+                        :if-does-not-exist :create)
+  (format file "~s,~s~%" (roslisp:ros-time) normality)))
 
 (defun write-loc-probs-to-csv (belief filename)
   "Writes a csv-file of location probabilities in the hashtable BELIEF
