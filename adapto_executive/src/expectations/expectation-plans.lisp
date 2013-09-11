@@ -121,11 +121,11 @@
       (start-continual-expectation-validation 2)
       (seq 
         (cram-process-modules:pm-execute :navigation loc1-desig)
-        (sleep 1)
+        (sleep 2)
         (cram-process-modules:pm-execute :navigation loc2-desig)
-        (sleep 1)
+        (sleep 2)
         (cram-process-modules:pm-execute :navigation loc3-desig)
-        (sleep 1)
+        (sleep 2)
         (cram-process-modules:pm-execute :navigation loc4-desig)))))
 
 (defun create-apartment-object-expectations ()

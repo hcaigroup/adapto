@@ -58,14 +58,17 @@
     (setf path-length (apply '+ distances-waypoints))
     
     ;; Generate an navigation-expectation of it not already exists
-    (unless (isgv :expectations 'time-to-goal)
-        (addgv :expectations 'time-to-goal (make-instance 'navigation-action-expectation
-                                         ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!!
-                                         ;; (at the moment just set 0.3)
-                                         :duration (/ path-length 0.15)
-                                         :start-time (roslisp:ros-time)
-                                         :path-length path-length
-                                         :avg-speed 0.3)))
+    (unless (isgv :expectations 'robot-expectations)
+        (addgv :expectations 'robot-expectations
+               (make-instance 'expectations-category
+                 :expectations-list (list
+                                     (make-instance 'navigation-action-expectation
+                                       ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!!
+                                       ;; (at the moment just set 0.3)
+                                       :duration (/ path-length 0.15)
+                                       :start-time (roslisp:ros-time)
+                                       :path-length path-length
+                                       :avg-speed 0.15)))))
     ;; (format t "Sum of waypoint-distances: ~s~%" path-length)
     ;; (format t "Linear-distance:              ~s~%" distance-air)
     ;; (format t "Difference: ~s~% ---------------- ~%" (- (apply '+ distances-waypoints) distance-air))
@@ -91,7 +94,7 @@
     (unless (eq [cpm:pm-status :navigation] :RUNNING)
       (when (eq last_navp 1)
         (roslisp:unsubscribe subscriber)
-        (remgv :expectations 'time-to-goal)
+        (remgv :expectations 'robot-expectations)
         (format t "-:NAVIGATION ENDED, removed expectation")))
     ;; Save last status 
     (if (eq [cpm:pm-status :navigation] :RUNNING)
