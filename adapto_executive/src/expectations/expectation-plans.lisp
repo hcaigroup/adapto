@@ -194,9 +194,18 @@
   (start-statevar-update)
   (init-expectations)
 
-  (create-apartment-object-expectations)
-  (create-apartment-human-expectations)
-  (create-apartment-world-expectations)
+  (addgv :kitchen-object 'Fork (create-object 'Fork "thing" 0 0 2 0 0 0 1))
+  (addgv :expectations 'object-expectations
+         (make-instance 'expectations-category
+           :expectations-list (list
+                               (make-instance 'object-on-floor-expectation
+                                 :object (make-instance 'thing
+                                           :pose (fl-funcall #'pose
+                                                             (getgv :kitchen-object 'Fork))
+                                           :last-detection NIL)
+                                 :expected-on-floor NIL)
+                               
+                           )))
   
   (par
      (start-continual-expectation-validation 2)))

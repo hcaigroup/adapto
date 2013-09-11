@@ -42,6 +42,10 @@
    (flexible :initarg :flexible :accessor flexible)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
+(defclass object-on-floor-expectation (expectation)
+  ((object :initarg :object :accessor object)
+   (expected-on-floor :initarg :expected-on-floor :accessor expected-on-floor)))
+
 (defclass action-expectation (expectation)
   ((action-type :initarg :action-type :accessor action-type)
    (duration :initarg :duration :accessor duration)
@@ -71,6 +75,22 @@
     (dolist (e (expectations-list exp))
       (setf normality-list (cons (validate-expectation e) normality-list)))
     normality-list))
+
+(defmethod validate-expectation ((exp object-on-floor-expectation))
+  (format t "FLOOR CHECK~%")
+  (let ((is-on-floor NIL))
+   (when (<
+          (float
+           (cl-transforms:z
+            (cl-transforms:origin [(pose (object exp))])))
+          0.3)
+     (setf is-on-floor T))
+   (format t "Found object at z=~s~%"
+           (cl-transforms:z
+            (cl-transforms:origin [(pose (object exp))])))
+   (if (eq (expected-on-floor exp) is-on-floor)
+     1
+     0)))
 
 (defmethod validate-expectation ((exp position-expectation))
   "Returns 1 if POSE of POSITION-EXPECTATION is inside AREA, else returns 0"
@@ -104,9 +124,7 @@
                delta-t
                (max-expected-duration exp))
               (max-expected-duration exp))))
-      1)
-
-    ))
+      1)))
 
 (defmethod validate-expectation ((exp object-expectation))
   "Returns 0 if a non-flexible object has moved, 1 otherwise"
