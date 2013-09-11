@@ -19,15 +19,22 @@
         (setf new-list (cons item new-list))))
     (reverse new-list)))
 
+;; WARNING!!! Dirty hack for ACS Deadline! TODO: Implement normality tree traversal!
+;; This will only work with depth = 2 and only categories in level 1
+(defun average-normality (normality-tree)
+  (average (mapcar #'average normality-tree)))
+
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
   (let ((normalities (map-global-structure 'validate-expectation :expectations)))
     normalities))
 
 (defun start-continual-expectation-validation (seconds)
-  (let ((last-validation-time 0) (average-normality NIL))
-    (format t "-- Normality-tree: ~s~%" (validate-expectations))
-    (setf average-normality (validate-expectations))
+  (let ((last-validation-time 0) (avg-normality NIL))
+    (setf avg-normality (average-normality (validate-expectations)))
+    (format t "Avg normality: [~s] -- Normality-tree: ~s~%"
+            avg-normality
+            (validate-expectations))    
     (setf last-validation-time (roslisp:ros-time))
     (sleep seconds)
     (unless (eq (get-global-structure :expectations) NIL)
