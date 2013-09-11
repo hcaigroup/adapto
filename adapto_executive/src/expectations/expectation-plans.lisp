@@ -94,7 +94,12 @@
   (create-apartment-world-expectations)
 
   (with-designators 
-      (( loc1-desig 
+      (( loc0-desig 
+         (location `((pose 
+                      ,(tf:make-pose-stamped "/map" 0.0 
+                                             (tf:make-3d-vector -0.29 1.1 0.0) 
+                                             (tf:euler->quaternion :az -0.36))))))
+       ( loc1-desig 
          (location `((pose 
                       ,(tf:make-pose-stamped "/map" 0.0 
                                              (tf:make-3d-vector 1.386 -0.647 0.0) 
@@ -119,7 +124,17 @@
       (maybe-run-process-modules)
       (start-navigation-watchdog)
       (start-continual-expectation-validation 2)
-      (seq 
+      (seq
+        (cram-process-modules:pm-execute :navigation loc0-desig)
+        (sleep 2)
+        (cram-process-modules:pm-execute :navigation loc1-desig)
+        (sleep 2)
+        (cram-process-modules:pm-execute :navigation loc2-desig)
+        (sleep 2)
+        (cram-process-modules:pm-execute :navigation loc3-desig)
+        (sleep 2)
+        (cram-process-modules:pm-execute :navigation loc4-desig)
+        (sleep 2)
         (cram-process-modules:pm-execute :navigation loc1-desig)
         (sleep 2)
         (cram-process-modules:pm-execute :navigation loc2-desig)
@@ -157,8 +172,8 @@
                                (make-instance 'position-expectation
                                  :area (make-instance 'moving-circle
                                          :radius 2
-                                         :x 3.67
-                                         :y -5.23)
+                                         :x -8.2
+                                         :y -2)
                                  :pose (fl-funcall #'pose (getgv :human 'louis)))))))
 
 (defun create-apartment-world-expectations ()
