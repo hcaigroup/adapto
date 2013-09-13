@@ -187,37 +187,26 @@
                                  :is-open (fl-funcall #'door-open
                                                       (getgv :doors 'DOOR_ENTRANCE)))))))
 
+;; Create inital expectations for objects at specific locations 
+;; NOTE: So far, orientation is not considered
+(defun init-kitchen-object-at-location (object-name object-type x y z)
+  (format t "--- Initializing object ~s~%" object-name)
+  (addgv :kitchen-object object-name (create-object object-name object-type x y z 0 0 0 1))
+  (setf (last-detection (value (getgv :kitchen-object object-name)))
+                         (pose (value (getgv :kitchen-object object-name)))))
 
 (defun create-kitchen-objects-expectations ()
 
-  ;; TODO: Clean up code, make more modular, get init objects out of here
-  ;; Make funtion to init list of objects
-  (addgv :kitchen-object 'Fork (create-object 'Fork "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Fork)))
-        (pose (value (getgv :kitchen-object 'Fork))))
-  (addgv :kitchen-object 'Knife (create-object 'Knife "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Knife)))
-        (pose (value (getgv :kitchen-object 'Knife))))
-  (addgv :kitchen-object 'Nutella (create-object 'Nutella "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Nutella)))
-        (pose (value (getgv :kitchen-object 'Nutella))))
-  (addgv :kitchen-object 'Jam (create-object 'Jam "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Jam)))
-        (pose (value (getgv :kitchen-object 'Jam))))
-  (addgv :kitchen-object 'Cornflakes (create-object 'Cornflakes "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Cornflakes)))
-        (pose (value (getgv :kitchen-object 'Cornflakes))))
-  (addgv :kitchen-object 'Bowl (create-object 'Bowl "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Bowl)))
-        (pose (value (getgv :kitchen-object 'Bowl))))
-  (addgv :kitchen-object 'Plate (create-object 'Plate "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Plate)))
-        (pose (value (getgv :kitchen-object 'Plate))))
+  (init-kitchen-object-at-location 'Fork "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Knife "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Nutella "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Jam "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Cornflakes "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Bowl "thing" 0 0 2)
+  (init-kitchen-object-at-location 'Plate "thing" 0 0 2)
   
-  (addgv :kitchen-object 'Kitchen_Table (create-object 'Kitchen_Table "thing" 0 0 2 0 0 0 1))
-  (setf (last-detection (value (getgv :kitchen-object 'Kitchen_Table)))
-        (pose (value (getgv :kitchen-object 'Kitchen_Table))))
-
+  (init-kitchen-object-at-location 'Kitchen_Table "thing" 0 0 2)
+  
   (addgv :expectations 'object-expectations
          (make-instance 'expectations-category
            :expectations-list (list
@@ -324,7 +313,6 @@
                                            :last-detection (fl-funcall #'last-detection
                                                                        (getgv :kitchen-object 'Kitchen_Table)))
                                  :flexible NIL)
-                               
                            ))))
 
 ;; Monitor the kitchen table
