@@ -129,7 +129,8 @@
   (let ((pub (roslisp:advertise
               "avg-normality"
               "std_msgs/Float32")))
-    (roslisp:publish-msg pub :data normality)))
+    (unless (null normality)
+      (roslisp:publish-msg pub :data normality))))
 
 (defun visualize-particleset (particleset plan-library)
   "Visualization of plan probabilities using Particle filter (for rxplot)"

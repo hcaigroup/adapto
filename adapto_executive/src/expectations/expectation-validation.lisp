@@ -19,10 +19,15 @@
         (setf new-list (cons item new-list))))
     (reverse new-list)))
 
-;; WARNING!!! Dirty hack for ACS Deadline! TODO: Implement normality tree traversal!
-;; This will only work with depth = 2 and only categories in level 1
 (defun average-normality (normality-tree)
-  (float (average (mapcar #'average normality-tree))))
+  (let ((top-level-normalities NIL))
+    (dolist (normality normality-tree)
+      (unless (null normality)
+        (if (listp normality)
+          (setf top-level-normalities (cons (first normality) top-level-normalities))
+          (setf top-level-normalities (cons normality top-level-normalities)))))
+    (unless (null (first top-level-normalities))
+      (average top-level-normalities))))
 
 ;; Validate all expectations in global structures
 (defun validate-expectations ()
