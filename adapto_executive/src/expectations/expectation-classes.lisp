@@ -60,6 +60,18 @@
    (avg-speed :initarg :avg-speed :accessor :avg-speed)
    (ready-for-validation :initarg :ready-for-validation :accessor ready-for-validation :initform T)))
 
+;; Methods for expectations categories
+
+(defgeneric add-expectation (x))
+
+(defmethod add-expectation (x)
+  (error "[expectations-classes.lisp] Expectations can only be added to expectations-categories!"))
+
+(defmethod add-expectaton ((exp expectations-category) expectation)
+  (setf (expectations-list exp)
+        (cons expectation (expectations-list exp)))
+  exp)
+
 ;; Validation methods of expectations MUST always return number between 0 or 1. 
 
 (defgeneric validate-expectation (x))
