@@ -122,9 +122,12 @@
            (setf plan-probs (calculate-plan-probabilities (belief hmm)))
            (unless (eq plan-probs NIL) (visualize-plan-probs plan-probs))
            (setf normality-tree (validate-expectations))
+           
            (format t "~s~%" normality-tree)
            (unless (eq normality-tree NIL)
-             (write-normality-tree-to-csv normality-tree "~/Desktop/normality-tree.csv"))
+             (write-normality-tree-to-csv normality-tree "~/Desktop/normality-tree.csv")
+             ;; (format t "Average normality is ~s~%" (average-normality normality-tree))
+             (visualize-normality (average-normality normality-tree)))
            (unless (eq plan-probs NIL)
              (write-plan-probs-to-csv plan-probs "~/Desktop/plan-probs.csv"))
            (unless (eq merged-belief NIL)
@@ -150,10 +153,7 @@
                   (addgv :expectations 'human-expectations
                          (create-or-update-duration-expectation current-location-observation
                                                       (gethash (string current-location-observation)
-                                                               max-loc-duration-table)))
-                  (format t "~%--- I guess human will stay maximally ~s s at ~s ---~%~%"
-                          (gethash (string current-location-observation) max-loc-duration-table)
-                          current-location-observation)))
+                                                               max-loc-duration-table)))))
               
               (when (eq last-stop-time NIL)
                 (setf last-stop-time (roslisp:ros-time))

@@ -19,57 +19,42 @@
 (defun create-or-update-duration-expectation (location-name max-expected-duration)
   "This function updates the duration expectation with new values or creates a new one of no
    duration expectation does exist. Returns expectations category."
-  (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
-    (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
-      (if (string= (string (type-of e)) "DURATION-EXPECTATION")
-        (progn
-          (setf expectations-list
-                (cons (make-instance 'duration-expectation
-                        :location-name (string location-name)
-                        :max-expected-duration max-expected-duration
-                        :time-entered (get-universal-time))
-                      expectations-list))
-          (setf found-exp T))
-        (setf expectations-list (cons e expectations-list))))
-    (when (eq found-exp NIL)
-      (progn
-        (setf expectations-list (cons (make-instance 'duration-expectation
-                                        :location-name (string location-name)
-                                        :max-expected-duration max-expected-duration
-                                        :time-entered (get-universal-time))
-                                      expectations-list))))
-    (make-instance 'expectations-category
-      :expectations-list expectations-list)))
+  (let ((*package* (find-package :ad-exe)))
+    (setgv :expectations 'human-expectations
+           (add-or-update-expectation
+            (getgv :expectations 'human-expectations)
+            'DURATION-EXPECTATION
+            (make-instance 'duration-expectation
+              :location-name (string location-name)
+              :max-expected-duration max-expected-duration
+              :time-entered (get-universal-time))))))
 
 (defun create-or-update-loc-exps-from-prob-dist (loc-probs location-observation)
   "This function updates all currently active next-location expectations with the current location
    detection. Returns expectations category"
-  (let ((*package* (find-package :ad-exe)) (expectations-list ()) (found-exp NIL))
-    (dolist (e (expectations-list (getgv :expectations 'human-expectations)))
-      (if (string= (string (type-of e)) "NEXT-LOCATION-EXPECTATION")
-        (progn
-          (when (eq (ready-for-validation e) NIL)
-            (setf expectations-list
-                  (cons (make-instance 'next-location-expectation
-                          :next-location-probdist loc-probs
-                          :next-location NIL
-                          :ready-for-validation NIL)
-                        expectations-list))
-            (setf expectations-list
-                  (cons (make-instance 'next-location-expectation
-                          :next-location-probdist (next-location-probdist e)
-                          :next-location location-observation
-                          :ready-for-validation T)
-                        expectations-list))
-            (setf found-exp T)))
-        (setf expectations-list (cons e expectations-list))))
-    (when (eq found-exp NIL)
-      (setf expectations-list (cons (make-instance 'next-location-expectation
-                                      :next-location-probdist loc-probs
-                                      :next-location NIL)
-                                    expectations-list)))
-    (make-instance 'expectations-category
-      :expectations-list expectations-list)))
+  (let ((*package* (find-package :ad-exe))
+         (human-expectations (getgv :expectations 'human-expectations)))
+    (unless (null (gethash 'NEXT-LOCATION-FUTURE (expectations-table human-expectations)))
+    (add-or-update-expectation
+     human-expectations
+     'NEXT-LOCATION-PAST
+     (make-instance 'next-location-expectation
+       :next-location-probdist (next-location-probdist
+                                (gethash 'NEXT-LOCATION-FUTURE
+                                         (expectations-table
+                                          human-expectations)))
+       :next-location location-observation
+       :ready-for-validation T))
+      )
+
+    (add-or-update-expectation
+     human-expectations
+     'NEXT-LOCATION-FUTURE
+     (make-instance 'next-location-expectation
+       :next-location-probdist loc-probs
+       :next-location NIL
+       :ready-for-validation T))
+    human-expectations))
 
 (defun generate-location-expectations ()
   "Here we define the instances of our expectations and put them into a global structure

@@ -8,7 +8,9 @@
 
 ;; Like in composite pattern, an expectation can also consist of several sub-expectations
 (defclass expectations-category (expectation)
-  ((expectations-list :initarg :expectations-list :accessor expectations-list)))
+  ;; NOTE: expectations-list is only kept for backwards compatibility!!!
+  ((expectations-list :initarg :expectations-list :accessor expectations-list)
+   (expectations-table :initarg :expectations-table :accessor expectations-table :initform (make-hash-table))))
 
 ;; Probabilistic expectations have a discrete probability distribution PROBDIST 
 (defclass probabilistic-expectation (expectation)
@@ -62,14 +64,22 @@
 
 ;; Methods for expectations categories
 
-(defgeneric add-expectation (x))
+(defgeneric add-or-update-expectation (expectations-category name expectation))
 
-(defmethod add-expectation (x)
+(defmethod add-or-update-expectation (expectations-category name expectation)
   (error "[expectations-classes.lisp] Expectations can only be added to expectations-categories!"))
 
-(defmethod add-expectaton ((exp expectations-category) expectation)
-  (setf (expectations-list exp)
-        (cons expectation (expectations-list exp)))
+(defmethod remove-expectation (a b)
+  (error "[expectations-classes.lisp] Expectations can only be removed from expectations-categories!"))
+
+(defmethod add-or-update-expectation ((exp expectations-category) name expectation)
+  "Add expectation if it does not exist, otherwise update the expecatation"
+  (setf (gethash name (expectations-table exp)) expectation)
+  exp)
+
+(defmethod remove-expectation ((exp expectations-category) name)
+  "Remove expectation from expectations category"
+  (remhash name (expectations-table exp))
   exp)
 
 ;; Validation methods of expectations MUST always return number between 0 or 1. 
@@ -84,11 +94,13 @@
 (defmethod validate-expectation ((exp expectations-category))
   "Iterate through expectations list and return average of each validated expectation"
   (let ((normality-list NIL))
-    (dolist (e (expectations-list exp))
-      (if (string= (string (type-of e)) "EXPECTATIONS-CATEGORY")
-        ;; If nested catories exist, use only first list element
-        (setf normality-list (cons (first (validate-expectation e)) normality-list))
-        (setf normality-list (cons (validate-expectation e) normality-list))))
+    (maphash #'(lambda (name e) 
+                 (declare (ignore name))
+                 (if (string= (string (type-of e)) "EXPECTATIONS-CATEGORY")
+                   ;; If nested catories exist, use only first list element
+                   (setf normality-list (cons (first (validate-expectation e)) normality-list))
+                   (setf normality-list (cons (validate-expectation e) normality-list))))
+             (expectations-table exp))
     (setf normality-list (cons (average (get-rid-of-nils normality-list)) normality-list))
     normality-list))
 
