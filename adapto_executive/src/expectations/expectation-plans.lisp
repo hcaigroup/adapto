@@ -234,26 +234,43 @@
   
   (init-kitchen-object-at-location 'Kitchen_Table "thing" 0 0 2)
   
-  (addgv :expectations 'object-expectations
+  (let ((expectations-table (make-hash-table)))
+    (setf (gethash 'FORK-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Fork 'thing NIL))
+    (setf (gethash 'KNIFE-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Knife 'thing NIL))
+    (setf (gethash 'JAM-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Jam 'thing NIL))
+    (setf (gethash 'NUTELLA-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Nutella 'thing NIL))
+    (setf (gethash 'CORNFLAKES-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Cornflakes 'thing NIL))
+    (setf (gethash 'BOWL-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Bowl 'thing NIL))
+    (setf (gethash 'PLATE-NOT-ON-FLOOR expectations-table)
+          (create-object-on-floor-expectation 'Plate 'thing NIL))
+
+    (setf (gethash 'FORK-STATIC expectations-table)
+                   (create-static-object-expectation 'Fork 'thing NIL))
+    (setf (gethash 'KNIFE-STATIC expectations-table)
+                   (create-static-object-expectation 'Knife 'thing NIL))
+    (setf (gethash 'JAM-STATIC expectations-table)
+                   (create-static-object-expectation 'Jam 'thing NIL))
+    (setf (gethash 'NUTELLA-STATIC expectations-table)
+                   (create-static-object-expectation 'Nutella 'thing NIL))
+    (setf (gethash 'CORNFLAKES-STATIC expectations-table)
+                   (create-static-object-expectation 'Cornflakes 'thing NIL))
+    (setf (gethash 'BOWL-STATIC expectations-table)
+                   (create-static-object-expectation 'Bowl 'thing NIL))
+    (setf (gethash 'PLATE-STATIC expectations-table)
+                   (create-static-object-expectation 'Plate 'thing NIL))
+
+    (setf (gethash 'KITCHEN-TABLE-STATIC expectations-table)
+                   (create-static-object-expectation 'Kitchen_Table 'thing NIL))
+
+    (addgv :expectations 'object-expectations
          (make-instance 'expectations-category
-           :expectations-list (list
-                               (create-object-on-floor-expectation 'Fork 'thing NIL)
-                               (create-object-on-floor-expectation 'Knife 'thing NIL)
-                               (create-object-on-floor-expectation 'Jam 'thing NIL)
-                               (create-object-on-floor-expectation 'Nutella 'thing NIL)
-                               (create-object-on-floor-expectation 'Cornflakes 'thing NIL)
-                               (create-object-on-floor-expectation 'Bowl 'thing NIL)
-                               (create-object-on-floor-expectation 'Plate 'thing NIL)
- 
-                               (create-static-object-expectation 'Fork 'thing NIL)
-                               (create-static-object-expectation 'Knife 'thing NIL)
-                               (create-static-object-expectation 'Jam 'thing NIL)
-                               (create-static-object-expectation 'Nutella 'thing NIL)
-                               (create-static-object-expectation 'Cornflakes 'thing NIL)
-                               (create-static-object-expectation 'Bowl 'thing NIL)
-                               (create-static-object-expectation 'Plate 'thing NIL)
-                               
-                               (create-static-object-expectation 'Kitchen_Table 'thing NIL)))))
+           :expectations-table expectations-table))))
 
 ;; Monitor the kitchen table
 (def-top-level-plan apartment-kitchen-task()
