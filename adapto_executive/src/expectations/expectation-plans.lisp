@@ -148,44 +148,53 @@
   (addgv :kitchen-object 'TV (create-object 'TV "thing" 0 0 0 0 0 0 1))
   (setf (last-detection (value (getgv :kitchen-object 'TV)))
         (pose (value (getgv :kitchen-object 'TV))))
-  (addgv :expectations 'object-expectations
-         (make-instance 'expectations-category
-           :expectations-list (list
-                               (make-instance 'object-expectation
-                                 :object (make-instance 'thing
-                                           :pose (fl-funcall #'pose
-                                                             (getgv :kitchen-object 'TV))
-                                           :last-detection (fl-funcall #'last-detection
-                                                                       (getgv :kitchen-object 'TV)))
-                                 :flexible NIL)
-                               (make-instance 'position-expectation
-                                 :area (make-instance 'moving-circle
-                                         :radius 2
-                                         :x 2.738
-                                         :y 1.230)
-                                 :pose (fl-funcall #'pose (getgv :kitchen-object 'TV)))))))
+
+  (let ((expectations-table (make-hash-table)))
+    (setf (gethash 'TV-static expectations-table)
+          (make-instance 'object-expectation
+            :object (make-instance 'thing
+                      :pose (fl-funcall #'pose
+                                        (getgv :kitchen-object 'TV))
+                      :last-detection (fl-funcall #'last-detection
+                                                  (getgv :kitchen-object 'TV)))
+            :flexible NIL) )
+    (setf (gethash 'TV-in-living-room expectations-table)
+          (make-instance 'position-expectation
+            :area (make-instance 'moving-circle
+                    :radius 2
+                    :x 2.738
+                    :y 1.230)
+            :pose (fl-funcall #'pose (getgv :kitchen-object 'TV))))
+    
+    (addgv :expectations 'object-expectations
+           (make-instance 'expectations-category
+             :expectations-table expectations-table))))
 
 (defun create-apartment-human-expectations ()
-  (addgv :expectations 'human-expectations
+  (let ((expectations-table (make-hash-table)))
+    (setf (gethash 'human-outside-house expectations-table)
+          (make-instance 'position-expectation
+            :area (make-instance 'moving-circle
+                    :radius 2
+                    :x -8.2
+                    :y -2)
+            :pose (fl-funcall #'pose (getgv :human 'louis))))
+    (addgv :expectations 'human-expectations
          (make-instance 'expectations-category
-           :expectations-list (list
-                               (make-instance 'position-expectation
-                                 :area (make-instance 'moving-circle
-                                         :radius 2
-                                         :x -8.2
-                                         :y -2)
-                                 :pose (fl-funcall #'pose (getgv :human 'louis)))))))
+           :expectations-table expectations-table))))
 
 (defun create-apartment-world-expectations ()
   (addgv :doors 'DOOR_ENTRANCE (create-door "DOOR_ENTRANCE" "left" NIL ""))
-  (addgv :expectations 'world-expectations
+  (let ((expectations-table (make-hash-table)))
+    (setf (gethash 'entrance-door-closed expectations-table)
+          (make-instance 'door-expectation
+            :door-name "DOOR_ENTRANCE"
+            :expected-open NIL
+            :is-open (fl-funcall #'door-open
+                                 (getgv :doors 'DOOR_ENTRANCE))))
+    (addgv :expectations 'world-expectations
          (make-instance 'expectations-category
-           :expectations-list (list
-                               (make-instance 'door-expectation
-                                 :door-name "DOOR_ENTRANCE"
-                                 :expected-open NIL
-                                 :is-open (fl-funcall #'door-open
-                                                      (getgv :doors 'DOOR_ENTRANCE)))))))
+           :expectations-table expectations-table)))))
 
 ;; NOTE: So far, orientation is not considered
 (defun init-kitchen-object-at-location (object-name object-type x y z)
