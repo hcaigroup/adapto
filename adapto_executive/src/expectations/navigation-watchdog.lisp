@@ -59,16 +59,18 @@
     
     ;; Generate an navigation-expectation of it not already exists
     (unless (isgv :expectations 'robot-expectations)
-        (addgv :expectations 'robot-expectations
+      (let ((expectations-table (make-hash-table)))
+        (setf (gethash 'robot-navigation expectations-table)
+              (make-instance 'navigation-action-expectation
+                ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!!
+                ;; (at the moment just set 0.3)
+                :duration (/ path-length 0.15)
+                :start-time (roslisp:ros-time)
+                :path-length path-length
+                :avg-speed 0.15))
+            (addgv :expectations 'robot-expectations
                (make-instance 'expectations-category
-                 :expectations-list (list
-                                     (make-instance 'navigation-action-expectation
-                                       ;; TODO: HERE AVERAGE SPEED SHOULD BE SET!!!!!
-                                       ;; (at the moment just set 0.3)
-                                       :duration (/ path-length 0.15)
-                                       :start-time (roslisp:ros-time)
-                                       :path-length path-length
-                                       :avg-speed 0.15)))))
+                 :expectations-table expectations-table))))
     ;; (format t "Sum of waypoint-distances: ~s~%" path-length)
     ;; (format t "Linear-distance:              ~s~%" distance-air)
     ;; (format t "Difference: ~s~% ---------------- ~%" (- (apply '+ distances-waypoints) distance-air))

@@ -194,7 +194,7 @@
                                  (getgv :doors 'DOOR_ENTRANCE))))
     (addgv :expectations 'world-expectations
          (make-instance 'expectations-category
-           :expectations-table expectations-table)))))
+           :expectations-table expectations-table))))
 
 ;; NOTE: So far, orientation is not considered
 (defun init-kitchen-object-at-location (object-name object-type x y z)
