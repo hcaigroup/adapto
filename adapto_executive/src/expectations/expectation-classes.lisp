@@ -64,6 +64,12 @@
 
 ;; Methods for expectations categories
 
+(defgeneric get-child-expectations (exp))
+
+(defmethod get-child-expectations ((exp expectations-category))
+  "Return child expectations of category as hashtable"
+  (expectations-table exp))
+
 (defgeneric add-or-update-expectation (expectations-category name expectation))
 
 (defmethod add-or-update-expectation (expectations-category name expectation)
