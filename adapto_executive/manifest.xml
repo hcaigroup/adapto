@@ -29,6 +29,7 @@
   <depend package="kdl_arm_kinematics"/>  
   <depend package="pr2_controllers_msgs"/>
   <depend package="trajectory_msgs"/>
+  <depend package="morse_msgs"/>
 </package>
 
 

@@ -16,7 +16,8 @@
                arm_navigation_msgs-msg
                pr2_controllers_msgs-msg
                trajectory_msgs-msg
-               roll)
+               roll
+               morse_msgs-msg)
   :components
   ( (:file "package")
     (:file "top-level-plans" :depends-on ("package"))
